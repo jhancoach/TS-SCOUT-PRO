@@ -1,6 +1,6 @@
 import React from 'react';
 import { TeamData } from '../types';
-import { Users, TrendingUp, DollarSign, Crosshair, ChevronRight } from 'lucide-react';
+import { Users, TrendingUp, Crosshair, ChevronRight } from 'lucide-react';
 
 interface TeamCardProps {
   team: TeamData;
