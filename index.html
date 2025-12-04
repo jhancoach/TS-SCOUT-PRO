@@ -29,6 +29,35 @@
       .custom-scrollbar::-webkit-scrollbar-thumb:hover {
         background: #52525b; /* Zinc-600 */
       }
+
+      @media print {
+        @page {
+          size: landscape;
+          margin: 1cm;
+        }
+        body {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+          background-color: white !important;
+          color: black !important;
+        }
+        /* Hide navbar and footer globally in print */
+        nav, footer, button {
+          display: none !important;
+        }
+        
+        /* Specific overrides for containers */
+        .min-h-screen {
+          min-height: auto !important;
+          background-color: white !important;
+          padding-bottom: 0 !important;
+        }
+        
+        /* Ensure charts print */
+        .recharts-responsive-container {
+          min-height: 300px !important;
+        }
+      }
     </style>
 <script type="importmap">
 {
