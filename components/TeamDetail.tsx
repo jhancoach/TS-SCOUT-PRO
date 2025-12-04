@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { TeamData } from '../types';
 import { StatsChart } from './RadarChart';
-import { generateTeamPitch } from '../services/geminiService';
-import { ArrowLeft, Bot, CheckCircle, AlertTriangle, Shield, Sword, User, Sparkles, Share2, Check, Copy } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Shield, Sword, User, Share2, Check } from 'lucide-react';
 
 interface TeamDetailProps {
   team: TeamData;
@@ -10,16 +9,7 @@ interface TeamDetailProps {
 }
 
 export const TeamDetail: React.FC<TeamDetailProps> = ({ team, onBack }) => {
-  const [pitch, setPitch] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
-
-  const handleGeneratePitch = async () => {
-    setLoading(true);
-    const result = await generateTeamPitch(team);
-    setPitch(result);
-    setLoading(false);
-  };
 
   const handleShare = () => {
     const textToShare = `TS SCOUT PRO - ANÁLISE\n\nPROJETO: ${team.name}\nRESUMO: ${team.summary}\n\nLINEUP: ${team.roster.map(p => p.name).join(', ')}\n\nSTATS:\n- Potencial: ${team.stats.potential}%\n- Prontidão: ${team.stats.readiness}%\n- Custo-Benefício: ${team.stats.costEfficiency}%`;
@@ -106,11 +96,11 @@ export const TeamDetail: React.FC<TeamDetailProps> = ({ team, onBack }) => {
           </div>
         </div>
 
-        {/* Right Column: Visuals & AI */}
+        {/* Right Column: Visuals */}
         <div className="lg:col-span-2 space-y-6">
           
           {/* Stats Section */}
-          <div className="bg-zinc-900 rounded-xl p-6 border border-zinc-800">
+          <div className="bg-zinc-900 rounded-xl p-6 border border-zinc-800 h-full">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-2xl font-rajdhani font-bold text-white">Performance Radar</h3>
               <div className="flex gap-4 text-xs font-bold uppercase tracking-wider">
@@ -188,78 +178,6 @@ export const TeamDetail: React.FC<TeamDetailProps> = ({ team, onBack }) => {
                 </div>
 
               </div>
-            </div>
-          </div>
-
-          {/* AI Pitch Generator */}
-          <div className="bg-zinc-900 rounded-xl p-1 border border-zinc-800 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity duration-700">
-              <Bot size={120} className="text-white" />
-            </div>
-            
-            <div className="p-8 bg-gradient-to-br from-zinc-900 to-zinc-950/50">
-              <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-                <h3 className="text-2xl font-rajdhani font-bold flex items-center gap-3 text-white">
-                  <Bot className="text-yellow-500" />
-                  Gemini Scout AI
-                </h3>
-                {!pitch && !loading && (
-                   <button 
-                   onClick={handleGeneratePitch}
-                   className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-3 rounded-sm text-sm font-bold uppercase tracking-widest transition-all flex items-center gap-2 hover:shadow-[0_0_15px_rgba(234,179,8,0.4)] active:scale-95 hover:-translate-y-0.5"
-                 >
-                   <Sparkles size={16} />
-                   Ver Pitch IA
-                 </button>
-                )}
-              </div>
-
-              {loading && (
-                <div className="py-12 flex flex-col items-center justify-center text-zinc-500 space-y-4">
-                  <div className="w-8 h-8 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
-                  <p className="animate-pulse text-sm font-bold uppercase tracking-widest text-yellow-500">Analisando dados do time...</p>
-                </div>
-              )}
-
-              {pitch && (
-                <div className="animate-fade-in bg-zinc-950 rounded border border-zinc-800 p-6 shadow-2xl relative">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-yellow-500"></div>
-                  <div className="prose prose-invert max-w-none prose-p:text-zinc-400 prose-headings:text-white prose-strong:text-yellow-500 prose-li:text-zinc-300">
-                     {/* Safe render of markdown-like text */}
-                     {pitch.split('\n').map((line, i) => (
-                       <p key={i} className="mb-3 text-sm leading-relaxed font-light">
-                         {line.replace(/\*\*/g, '').replace(/^- /, '• ')}
-                       </p>
-                     ))}
-                  </div>
-                  <div className="mt-6 flex justify-end gap-3">
-                     <button 
-                      onClick={() => {
-                        navigator.clipboard.writeText(pitch);
-                        setCopied(true);
-                        setTimeout(() => setCopied(false), 2000);
-                      }}
-                      className="flex items-center gap-2 text-xs text-zinc-500 hover:text-white transition-colors font-bold uppercase tracking-widest hover:bg-zinc-800 px-3 py-1 rounded"
-                    >
-                      <Copy size={12} />
-                      Copiar Texto
-                    </button>
-                    <button 
-                      onClick={handleGeneratePitch} 
-                      className="flex items-center gap-2 text-xs text-zinc-600 hover:text-yellow-500 transition-colors font-bold uppercase tracking-widest hover:bg-zinc-900 px-3 py-1 rounded"
-                    >
-                      <Sparkles size={12} />
-                      Regenerar
-                    </button>
-                  </div>
-                </div>
-              )}
-              
-              {!pitch && !loading && (
-                 <p className="text-zinc-500 text-sm font-light border-l border-zinc-800 pl-4 group-hover:border-yellow-500/30 transition-colors">
-                   Utilize a Inteligência Artificial para gerar um pitch de venda persuasivo baseado nas métricas e características únicas do {team.name}.
-                 </p>
-              )}
             </div>
           </div>
 
