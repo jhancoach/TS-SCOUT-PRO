@@ -31,55 +31,29 @@ export const TEAMS: TeamData[] = [
   },
   {
     id: 'team2',
-    name: 'SQUAD: STRUCTURE',
-    themeColor: '#3b82f6', // Blue
-    summary: 'Experiência e Liderança',
+    name: 'PROJECT: LEGACY',
+    themeColor: '#8b5cf6', // Violet
+    summary: 'Experiência, Títulos e Visibilidade',
     roster: [
-      { name: 'WLIU', role: 'CPT / Bomba', notes: 'Controle de jogo, já jogou mundial' },
-      { name: 'PITBULL', role: 'Rush 1', notes: 'Experiência, Agressividade' },
-      { name: 'LUAN', role: 'Rush 2', notes: 'Talento, Quebra de Call' },
-      { name: 'ERICKING', role: 'Sniper', notes: 'Posicionamento' },
-      { name: 'BYTE33', role: 'Support/Flex' }
+      { name: 'CAUAN' },
+      { name: 'NANDO9' },
+      { name: 'LOST' },
+      { name: 'NODA' },
+      { name: 'PROXX', role: 'POSSIBILIDADE' }
     ],
     characteristics: [
-      'Alta Experiência',
-      'Captain Promissor (Mundial)',
-      'WLIU finalmente com estrutura',
-      'Resultado Mediano Garantido',
-      'Controle de Jogo'
+      'Experiência Comprovada',
+      'Histórico de Títulos',
+      'Alta Visibilidade de Mídia',
+      'Controle de Jogo Absoluto',
+      'Respeito dentro e fora do jogo'
     ],
     stats: {
-      potential: 70,
-      aggression: 75,
-      experience: 90,
-      costEfficiency: 60,
-      readiness: 85
-    }
-  },
-  {
-    id: 'team3',
-    name: 'INITIATIVE: SPARK',
-    themeColor: '#f59e0b', // Amber
-    summary: 'Longo Prazo / Desenvolvimento',
-    roster: [
-      { name: 'ISOPOR21' },
-      { name: 'DENE' },
-      { name: 'KAZUMA' },
-      { name: 'GN9' },
-      { name: 'TBA', role: 'Vaga Aberta' } 
-    ],
-    characteristics: [
-      'Foco em Lapidar',
-      'Necessidade de tempo',
-      'Sem potencial de resultado rápido',
-      'Margem de aprendizado'
-    ],
-    stats: {
-      potential: 60,
-      aggression: 50,
-      experience: 30,
-      costEfficiency: 80,
-      readiness: 20
+      potential: 85,
+      aggression: 65, // Mais controle, menos agressividade desenfreada
+      experience: 98,
+      costEfficiency: 60, // Jogadores renomados tendem a custar mais
+      readiness: 95 // Prontos para jogar agora
     }
   }
 ];
