@@ -12,7 +12,7 @@ export const TEAMS: TeamData[] = [
       { name: 'GUIME' },
       { name: 'ERICKING' },
       { name: 'PROZIN' },
-      { name: 'COACH BRN', role: 'COACH' }
+      { name: 'COACH BRN / PUTSGRILO', role: 'COACH' }
     ],
     characteristics: [
       'Top 6 (WB Split 2)',
@@ -64,7 +64,7 @@ export const TEAMS: TeamData[] = [
     themeColor: '#f97316', // Orange
     summary: 'Agressividade, Bala e Potencial Tático',
     roster: [
-      { name: 'COACH BRN', role: 'ESTATEGISTA', notes: 'Foco tático em treinos/camps' },
+      { name: 'COACH BRN / PUTSGRILO', role: 'ESTATEGISTA', notes: 'Foco tático em treinos/camps' },
       { name: 'WLIU', role: 'CPT', notes: 'Liderança em progressão' },
       { name: 'PITBULL', role: 'VETERANO', notes: 'Experiência' },
       { name: 'THEUS7', notes: '6º Melhor Rush Split 2 / Quebra Call' },

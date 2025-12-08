@@ -6,7 +6,8 @@ import { TeamDetail } from './components/TeamDetail';
 import { IntroSlide } from './components/IntroSlide';
 import { TeamBuilder } from './components/TeamBuilder';
 import { AdminLogin } from './components/AdminLogin';
-import { LayoutGrid, Target, Zap, Home, Lock, LogOut, BarChart2 } from 'lucide-react';
+import { Presentation } from './components/Presentation';
+import { LayoutGrid, Target, Zap, Home, Lock, LogOut, BarChart2, Presentation as PresentationIcon } from 'lucide-react';
 
 const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.INTRO);
@@ -60,6 +61,11 @@ const App: React.FC = () => {
     return <IntroSlide onStart={handleStart} />;
   }
 
+  // Render Full Screen Presentation
+  if (viewMode === ViewMode.PRESENTATION) {
+    return <Presentation onBack={() => setViewMode(ViewMode.DASHBOARD)} />;
+  }
+
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-200 selection:bg-yellow-500 selection:text-black pb-20 relative">
       
@@ -82,6 +88,15 @@ const App: React.FC = () => {
              >
                <Home size={14} />
                <span className="hidden sm:inline">Início</span>
+             </button>
+
+             {/* Presentation Button */}
+             <button 
+               onClick={() => setViewMode(ViewMode.PRESENTATION)}
+               className="flex items-center gap-2 text-zinc-500 hover:text-yellow-500 transition-colors uppercase font-bold tracking-wider text-xs border border-zinc-800 hover:border-yellow-500/50 px-4 py-2 rounded-sm bg-zinc-900"
+             >
+               <PresentationIcon size={14} />
+               <span className="hidden sm:inline">Apresentação TS</span>
              </button>
 
              {/* External Link: Stats FF */}
