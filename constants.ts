@@ -75,8 +75,8 @@ export const TEAMS: TeamData[] = [
       'Wliu e Brn: Fome de estrutura',
       'Time extremamente agressivo (Bala)',
       'Excelente em Quebras de Call',
-      'Honey: Potencial de adaptação (Sniper/Rush)',
-      'Brn: Perfil Estrategista',
+      'Honey: Potencial de adaptação',
+      'Brn: Perfil Estrategista (Treinos)',
       'Custo Baixo para Médio'
     ],
     stats: {
@@ -84,7 +84,7 @@ export const TEAMS: TeamData[] = [
       aggression: 98,
       experience: 65,
       costEfficiency: 80,
-      readiness: 80
+      readiness: 82
     }
   }
 ];
