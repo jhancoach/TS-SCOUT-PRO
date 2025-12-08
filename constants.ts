@@ -11,7 +11,8 @@ export const TEAMS: TeamData[] = [
       { name: 'FNX' },
       { name: 'GUIME' },
       { name: 'ERICKING' },
-      { name: 'PROZIN' }
+      { name: 'PROZIN' },
+      { name: 'COACH BRN', role: 'COACH' }
     ],
     characteristics: [
       'Top 6 (WB Split 2)',
@@ -39,7 +40,8 @@ export const TEAMS: TeamData[] = [
       { name: 'MOTOVEA' },
       { name: 'LOST' },
       { name: 'NODA' },
-      { name: 'PROXX', role: 'POSSIBILIDADE' }
+      { name: 'PROXX', role: 'POSSIBILIDADE' },
+      { name: 'COACH PUTSGRILO', role: 'COACH' }
     ],
     characteristics: [
       'Experiência Comprovada',
@@ -54,6 +56,35 @@ export const TEAMS: TeamData[] = [
       experience: 98,
       costEfficiency: 60, // Jogadores renomados tendem a custar mais
       readiness: 95 // Prontos para jogar agora
+    }
+  },
+  {
+    id: 'team3',
+    name: 'PROJECT: ASCENSION',
+    themeColor: '#f97316', // Orange
+    summary: 'Agressividade, Bala e Potencial Tático',
+    roster: [
+      { name: 'COACH BRN', role: 'ESTATEGISTA', notes: 'Foco tático em treinos/camps' },
+      { name: 'WLIU', role: 'CPT', notes: 'Liderança em progressão' },
+      { name: 'PITBULL', role: 'VETERANO', notes: 'Experiência' },
+      { name: 'THEUS7', notes: '6º Melhor Rush Split 2 / Quebra Call' },
+      { name: 'HONEY', role: 'FLEX', notes: 'Sniper virando Rush' },
+      { name: 'BYTE 33' }
+    ],
+    characteristics: [
+      'Wliu e Brn: Fome de estrutura',
+      'Time extremamente agressivo (Bala)',
+      'Excelente em Quebras de Call',
+      'Honey: Potencial de adaptação (Sniper/Rush)',
+      'Brn: Perfil Estrategista',
+      'Custo Baixo para Médio'
+    ],
+    stats: {
+      potential: 92,
+      aggression: 98,
+      experience: 65,
+      costEfficiency: 80,
+      readiness: 80
     }
   }
 ];
