@@ -194,5 +194,6 @@ export const TeamBuilder: React.FC<TeamBuilderProps> = ({ onSave, onCancel }) =>
           </div>
         </div>
       </div>
-    );
+    </div>
+  );
 };
