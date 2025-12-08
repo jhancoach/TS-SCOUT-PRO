@@ -6,7 +6,7 @@ import { TeamDetail } from './components/TeamDetail';
 import { IntroSlide } from './components/IntroSlide';
 import { TeamBuilder } from './components/TeamBuilder';
 import { AdminLogin } from './components/AdminLogin';
-import { LayoutGrid, Target, Zap, Home, Lock, LogOut } from 'lucide-react';
+import { LayoutGrid, Target, Zap, Home, Lock, LogOut, BarChart2 } from 'lucide-react';
 
 const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.INTRO);
@@ -83,6 +83,17 @@ const App: React.FC = () => {
                <Home size={14} />
                <span className="hidden sm:inline">Início</span>
              </button>
+
+             {/* External Link: Stats FF */}
+             <a 
+               href="https://jhan-stats.vercel.app/"
+               target="_blank"
+               rel="noopener noreferrer"
+               className="flex items-center gap-2 text-zinc-500 hover:text-yellow-500 transition-colors uppercase font-bold tracking-wider text-xs border border-zinc-800 hover:border-yellow-500/50 px-4 py-2 rounded-sm bg-zinc-900"
+             >
+               <BarChart2 size={14} />
+               <span className="hidden sm:inline">Stats FF</span>
+             </a>
 
              {/* Admin Button */}
              <button 
