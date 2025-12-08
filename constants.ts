@@ -36,7 +36,7 @@ export const TEAMS: TeamData[] = [
     summary: 'Experiência, Títulos e Visibilidade',
     roster: [
       { name: 'CAUAN' },
-      { name: 'NANDO9' },
+      { name: 'MOTOVEA' },
       { name: 'LOST' },
       { name: 'NODA' },
       { name: 'PROXX', role: 'POSSIBILIDADE' }

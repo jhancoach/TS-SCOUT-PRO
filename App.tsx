@@ -4,11 +4,13 @@ import { TeamData, ViewMode } from './types';
 import { TeamCard } from './components/TeamCard';
 import { TeamDetail } from './components/TeamDetail';
 import { IntroSlide } from './components/IntroSlide';
-import { LayoutGrid, Target, Zap, Home } from 'lucide-react';
+import { TeamBuilder } from './components/TeamBuilder';
+import { LayoutGrid, Target, Zap, Home, PlusCircle } from 'lucide-react';
 
 const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.INTRO);
   const [selectedTeam, setSelectedTeam] = useState<TeamData | null>(null);
+  const [customTeams, setCustomTeams] = useState<TeamData[]>([]);
 
   const handleTeamClick = (team: TeamData) => {
     setSelectedTeam(team);
@@ -23,6 +25,14 @@ const App: React.FC = () => {
   const handleStart = () => {
     setViewMode(ViewMode.DASHBOARD);
   };
+
+  const handleSaveCustomTeam = (newTeam: TeamData) => {
+    setCustomTeams([...customTeams, newTeam]);
+    setViewMode(ViewMode.DASHBOARD);
+  };
+
+  // Combine default teams with custom teams
+  const allTeams = [...TEAMS, ...customTeams];
 
   // Render Intro Slide independently
   if (viewMode === ViewMode.INTRO) {
@@ -76,11 +86,25 @@ const App: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {TEAMS.map((team) => (
+              {allTeams.map((team) => (
                 <div key={team.id} className="h-96">
                    <TeamCard team={team} onClick={handleTeamClick} />
                 </div>
               ))}
+              
+              {/* Add New Team Card */}
+              <div 
+                onClick={() => setViewMode(ViewMode.BUILDER)}
+                className="h-96 rounded-xl border-2 border-dashed border-zinc-800 bg-zinc-900/30 hover:bg-zinc-900 hover:border-yellow-500/50 cursor-pointer flex flex-col items-center justify-center gap-4 transition-all duration-200 group"
+              >
+                <div className="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center group-hover:bg-yellow-500 group-hover:text-black text-zinc-500 transition-colors">
+                  <PlusCircle size={32} />
+                </div>
+                <div className="text-center">
+                  <h3 className="text-xl font-bold font-rajdhani text-zinc-300 group-hover:text-white uppercase tracking-wider">Cadastrar Elenco</h3>
+                  <p className="text-zinc-500 text-sm mt-1">Criar projeto personalizado</p>
+                </div>
+              </div>
             </div>
 
             {/* Comparison Overview Widget (Bottom) */}
@@ -102,7 +126,7 @@ const App: React.FC = () => {
                      </tr>
                    </thead>
                    <tbody className="text-sm">
-                     {TEAMS.map(t => (
+                     {allTeams.map(t => (
                        <tr key={t.id} className="hover:bg-zinc-950 transition-colors border-b border-zinc-800/50 last:border-0 group">
                          <td className="py-5 pl-4 font-bold text-white group-hover:text-yellow-500 transition-colors font-rajdhani text-lg">{t.name}</td>
                          <td className="py-5 text-zinc-400 font-light">{t.summary}</td>
@@ -124,7 +148,7 @@ const App: React.FC = () => {
                             </span>
                          </td>
                          <td className="py-5 text-zinc-500 font-medium text-xs uppercase tracking-wider">
-                           {t.characteristics[0]}
+                           {t.characteristics[0] || '-'}
                          </td>
                        </tr>
                      ))}
@@ -137,6 +161,13 @@ const App: React.FC = () => {
 
         {viewMode === ViewMode.DETAIL && selectedTeam && (
           <TeamDetail team={selectedTeam} onBack={handleBack} />
+        )}
+
+        {viewMode === ViewMode.BUILDER && (
+          <TeamBuilder 
+            onSave={handleSaveCustomTeam} 
+            onCancel={() => setViewMode(ViewMode.DASHBOARD)} 
+          />
         )}
 
       </main>
