@@ -5,12 +5,14 @@ import { TeamCard } from './components/TeamCard';
 import { TeamDetail } from './components/TeamDetail';
 import { IntroSlide } from './components/IntroSlide';
 import { TeamBuilder } from './components/TeamBuilder';
-import { LayoutGrid, Target, Zap, Home, PlusCircle } from 'lucide-react';
+import { AdminLogin } from './components/AdminLogin';
+import { LayoutGrid, Target, Zap, Home, Lock, LogOut } from 'lucide-react';
 
 const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.INTRO);
   const [selectedTeam, setSelectedTeam] = useState<TeamData | null>(null);
   const [customTeams, setCustomTeams] = useState<TeamData[]>([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const handleTeamClick = (team: TeamData) => {
     setSelectedTeam(team);
@@ -28,6 +30,25 @@ const App: React.FC = () => {
 
   const handleSaveCustomTeam = (newTeam: TeamData) => {
     setCustomTeams([...customTeams, newTeam]);
+    // Stay in builder or go back? Let's go back to dashboard but keep auth
+    setViewMode(ViewMode.DASHBOARD);
+  };
+
+  const handleAdminClick = () => {
+    if (isAuthenticated) {
+      setViewMode(ViewMode.BUILDER);
+    } else {
+      setViewMode(ViewMode.ADMIN_LOGIN);
+    }
+  };
+
+  const handleAdminLoginSuccess = () => {
+    setIsAuthenticated(true);
+    setViewMode(ViewMode.BUILDER);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
     setViewMode(ViewMode.DASHBOARD);
   };
 
@@ -54,13 +75,23 @@ const App: React.FC = () => {
             </span>
           </div>
           
-          <div className="flex items-center gap-6 text-sm font-medium">
+          <div className="flex items-center gap-4 text-sm font-medium">
              <button 
                onClick={() => setViewMode(ViewMode.INTRO)}
                className="flex items-center gap-2 text-zinc-500 hover:text-yellow-500 transition-colors uppercase font-bold tracking-wider text-xs border border-zinc-800 hover:border-yellow-500/50 px-4 py-2 rounded-sm bg-zinc-900"
              >
                <Home size={14} />
-               <span>Início</span>
+               <span className="hidden sm:inline">Início</span>
+             </button>
+
+             {/* Admin Button */}
+             <button 
+               onClick={isAuthenticated ? handleLogout : handleAdminClick}
+               className={`flex items-center gap-2 transition-colors uppercase font-bold tracking-wider text-xs border px-4 py-2 rounded-sm ${isAuthenticated ? 'text-yellow-500 border-yellow-500/50 bg-yellow-500/10 hover:bg-yellow-500/20' : 'text-zinc-500 border-zinc-800 bg-zinc-900 hover:text-white hover:border-zinc-600'}`}
+               title={isAuthenticated ? "Sair do modo Admin" : "Acesso Admin"}
+             >
+               {isAuthenticated ? <LogOut size={14} /> : <Lock size={14} />}
+               <span className="hidden sm:inline">{isAuthenticated ? 'Admin Logout' : 'Admin'}</span>
              </button>
 
              <div className="hidden md:flex items-center gap-2 text-yellow-500 bg-yellow-500/10 px-3 py-1 rounded-full border border-yellow-500/20">
@@ -92,19 +123,7 @@ const App: React.FC = () => {
                 </div>
               ))}
               
-              {/* Add New Team Card */}
-              <div 
-                onClick={() => setViewMode(ViewMode.BUILDER)}
-                className="h-96 rounded-xl border-2 border-dashed border-zinc-800 bg-zinc-900/30 hover:bg-zinc-900 hover:border-yellow-500/50 cursor-pointer flex flex-col items-center justify-center gap-4 transition-all duration-200 group"
-              >
-                <div className="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center group-hover:bg-yellow-500 group-hover:text-black text-zinc-500 transition-colors">
-                  <PlusCircle size={32} />
-                </div>
-                <div className="text-center">
-                  <h3 className="text-xl font-bold font-rajdhani text-zinc-300 group-hover:text-white uppercase tracking-wider">Cadastrar Elenco</h3>
-                  <p className="text-zinc-500 text-sm mt-1">Criar projeto personalizado</p>
-                </div>
-              </div>
+              {/* Removed "Add New Team" Card - Moved to Admin Section */}
             </div>
 
             {/* Comparison Overview Widget (Bottom) */}
@@ -161,6 +180,13 @@ const App: React.FC = () => {
 
         {viewMode === ViewMode.DETAIL && selectedTeam && (
           <TeamDetail team={selectedTeam} onBack={handleBack} />
+        )}
+
+        {viewMode === ViewMode.ADMIN_LOGIN && (
+          <AdminLogin 
+            onLoginSuccess={handleAdminLoginSuccess} 
+            onCancel={() => setViewMode(ViewMode.DASHBOARD)} 
+          />
         )}
 
         {viewMode === ViewMode.BUILDER && (
