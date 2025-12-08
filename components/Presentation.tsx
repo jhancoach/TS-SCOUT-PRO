@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   ChevronLeft, ChevronRight, Home, Target, MapPin, 
   Trophy, Activity, Users, Star, Gift, Shield, 
-  UserCheck, MessageSquare, Zap, MonitorPlay
+  UserCheck, MessageSquare, Zap, MonitorPlay, Heart, Utensils
 } from 'lucide-react';
 
 interface PresentationProps {
@@ -46,8 +46,8 @@ export const Presentation: React.FC<PresentationProps> = ({ onBack }) => {
         { label: 'Setup Profissional', icon: <MonitorPlay /> },
         { label: 'Espaço de Estratégia', icon: <MapPin /> },
         { label: 'Sala Tática com TVs', icon: <Activity /> },
-        { label: 'Área de Convivência', icon: <Users /> },
-        { label: 'Internet Dedicada', icon: <Zap /> },
+        { label: 'Cozinha e Refeitório', icon: <Utensils /> },
+        { label: 'Suporte Psicológico', icon: <Heart /> },
       ]
     },
     {
@@ -67,10 +67,10 @@ export const Presentation: React.FC<PresentationProps> = ({ onBack }) => {
       type: 'content',
       title: 'Resultados e Histórico',
       content: [
-        'Presença constante nas principais ligas nacionais',
-        'Histórico de revelação de talentos para a Série A',
-        'Parcerias estratégicas com marcas endêmicas',
-        'Notoriedade pela organização tática e disciplina'
+        'Campeonatos vencidos e Títulos Expressivos',
+        'TOPs relevantes nas principais ligas',
+        'Destaques de jogadores revelados para o cenário',
+        'Parcerias e notoriedade no mercado'
       ],
       icon: <Trophy size={48} />
     },
@@ -78,9 +78,9 @@ export const Presentation: React.FC<PresentationProps> = ({ onBack }) => {
       type: 'process',
       title: 'Processo de Treino',
       steps: [
-        { time: 'Fase 1', desc: 'Rotação e Early Game' },
-        { time: 'Fase 2', desc: 'Mid Game e Controle' },
-        { time: 'Fase 3', desc: 'End Game e Decisão' },
+        { time: 'Treino 1', desc: 'Rotação e Early Game' },
+        { time: 'Treino 2', desc: 'Mid Game e Controle' },
+        { time: 'Treino 3', desc: 'End Game e Decisão' },
         { time: 'Review', desc: 'Análise de VOD Diária' }
       ]
     },
@@ -115,7 +115,7 @@ export const Presentation: React.FC<PresentationProps> = ({ onBack }) => {
       items: [
         { label: 'Possibilidade de Salário', icon: <Gift /> },
         { label: 'Moradia na GH', icon: <Home /> },
-        { label: 'Alimentação Completa', icon: <UserCheck /> },
+        { label: 'Alimentação Completa', icon: <Utensils /> },
         { label: 'Premiações', icon: <Trophy /> },
         { label: 'Apoio de Mídia', icon: <MonitorPlay /> },
         { label: 'Profissionalização', icon: <Star /> },
@@ -170,7 +170,8 @@ export const Presentation: React.FC<PresentationProps> = ({ onBack }) => {
       content: [
         'Instagram: @teamsolid_oficial',
         'Email: contato@teamsolid.gg',
-        'Discord: Community Team Solid'
+        'WhatsApp: (XX) 9XXXX-XXXX',
+        'Link na Bio: Formulário de Inscrição'
       ],
       icon: <Shield size={64} />
     }
