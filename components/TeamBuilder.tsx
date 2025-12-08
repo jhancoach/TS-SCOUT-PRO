@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TeamData, Player } from '../types';
-import { Save, X, Plus, Trash2, User } from 'lucide-react';
+import { Save, Plus, Trash2, User } from 'lucide-react';
 
 interface TeamBuilderProps {
   onSave: (team: TeamData) => void;
@@ -194,6 +194,5 @@ export const TeamBuilder: React.FC<TeamBuilderProps> = ({ onSave, onCancel }) =>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
 };
