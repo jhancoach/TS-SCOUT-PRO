@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { User, Shield, Target, Bomb, Crosshair, Crown, Plus, Trash2, RotateCcw, MonitorPlay } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { User, Target, Bomb, Crosshair, Crown, Plus, Trash2, MonitorPlay, Download, FilePlus } from 'lucide-react';
+// @ts-ignore
+import html2canvas from 'html2canvas';
 
 interface RosterSlot {
   id: number;
@@ -36,6 +38,9 @@ export const RosterBuilder: React.FC = () => {
     { id: 5, type: 'PLAYER', label: 'JOGADOR 5', assignedName: null, assignedRole: null },
   ]);
 
+  const boardRef = useRef<HTMLDivElement>(null);
+  const [isCapturing, setIsCapturing] = useState(false);
+
   const handleAddPlayer = () => {
     if (newName.trim()) {
       setAvailablePlayers([...availablePlayers, newName.toUpperCase().trim()]);
@@ -59,10 +64,6 @@ export const RosterBuilder: React.FC = () => {
     e.dataTransfer.effectAllowed = type === 'ROLE' ? 'copy' : 'move';
   };
 
-  const onDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
   const onDrop = (e: React.DragEvent, slotId: number) => {
     e.preventDefault();
     const data = JSON.parse(e.dataTransfer.getData('application/json'));
@@ -72,8 +73,6 @@ export const RosterBuilder: React.FC = () => {
         if (data.type === 'NAME') {
           return { ...slot, assignedName: data.value };
         } else if (data.type === 'ROLE') {
-          // If trying to drop regular roles on Coach slot, or Coach role on Player slot, maybe warn? 
-          // But for freedom, let's allow it, except visual feedback might be needed.
           return { ...slot, assignedRole: data.value };
         }
       }
@@ -86,14 +85,46 @@ export const RosterBuilder: React.FC = () => {
   };
 
   const resetBoard = () => {
-    setSlots([
-        { id: 0, type: 'COACH', label: 'COACH', assignedName: null, assignedRole: 'COACH' },
-        { id: 1, type: 'PLAYER', label: 'JOGADOR 1', assignedName: null, assignedRole: null },
-        { id: 2, type: 'PLAYER', label: 'JOGADOR 2', assignedName: null, assignedRole: null },
-        { id: 3, type: 'PLAYER', label: 'JOGADOR 3', assignedName: null, assignedRole: null },
-        { id: 4, type: 'PLAYER', label: 'JOGADOR 4', assignedName: null, assignedRole: null },
-        { id: 5, type: 'PLAYER', label: 'JOGADOR 5', assignedName: null, assignedRole: null },
-    ]);
+    if (window.confirm('Tem certeza que deseja limpar todo o elenco?')) {
+        setSlots([
+            { id: 0, type: 'COACH', label: 'COACH', assignedName: null, assignedRole: 'COACH' },
+            { id: 1, type: 'PLAYER', label: 'JOGADOR 1', assignedName: null, assignedRole: null },
+            { id: 2, type: 'PLAYER', label: 'JOGADOR 2', assignedName: null, assignedRole: null },
+            { id: 3, type: 'PLAYER', label: 'JOGADOR 3', assignedName: null, assignedRole: null },
+            { id: 4, type: 'PLAYER', label: 'JOGADOR 4', assignedName: null, assignedRole: null },
+            { id: 5, type: 'PLAYER', label: 'JOGADOR 5', assignedName: null, assignedRole: null },
+        ]);
+    }
+  };
+
+  const handleSavePNG = async () => {
+    if (boardRef.current) {
+        setIsCapturing(true);
+        try {
+            // Wait a moment for any state updates if needed, though usually not required here
+            const canvas = await html2canvas(boardRef.current, {
+                backgroundColor: '#09090b', // Zinc-950 background
+                scale: 2, // High resolution
+                logging: false,
+                useCORS: true,
+                ignoreElements: (element) => {
+                   // Ignore elements with class 'no-print'
+                   return element.classList.contains('no-print');
+                }
+            });
+            
+            const image = canvas.toDataURL("image/png");
+            const link = document.createElement("a");
+            link.href = image;
+            link.download = `TS-SCOUT-ROSTER-${Date.now()}.png`;
+            link.click();
+        } catch (error) {
+            console.error("Erro ao gerar imagem:", error);
+            alert("Não foi possível gerar a imagem. Tente novamente.");
+        } finally {
+            setIsCapturing(false);
+        }
+    }
   };
 
   return (
@@ -170,18 +201,37 @@ export const RosterBuilder: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Board */}
-      <div className="lg:col-span-3 bg-zinc-900/50 border border-zinc-800 rounded-xl p-8 relative overflow-hidden flex flex-col items-center justify-center">
+      {/* Main Board Container */}
+      <div 
+        ref={boardRef}
+        className="lg:col-span-3 bg-zinc-900/50 border border-zinc-800 rounded-xl p-8 relative overflow-hidden flex flex-col items-center justify-center"
+      >
         {/* Decorative Grid */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_80%)] pointer-events-none"></div>
 
-        <div className="absolute top-6 right-6 z-20">
-            <button onClick={resetBoard} className="flex items-center gap-2 text-zinc-500 hover:text-red-500 text-xs font-bold uppercase tracking-wider transition-colors">
-                <RotateCcw size={14} /> Resetar
+        {/* Toolbar - Marked no-print to hide from image capture if desired, though user might want buttons visible? No, usually not. */}
+        <div className="absolute top-6 right-6 z-20 flex gap-3 no-print" data-html2canvas-ignore>
+             <button 
+                onClick={resetBoard} 
+                className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 hover:border-red-500 hover:text-red-500 text-zinc-400 px-4 py-2 rounded text-xs font-bold uppercase tracking-wider transition-all"
+            >
+                <FilePlus size={14} /> Novo Elenco
+            </button>
+            <button 
+                onClick={handleSavePNG} 
+                disabled={isCapturing}
+                className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 rounded text-xs font-bold uppercase tracking-wider transition-colors shadow-[0_0_15px_rgba(234,179,8,0.2)]"
+            >
+                <Download size={14} /> {isCapturing ? 'Gerando...' : 'Salvar PNG'}
             </button>
         </div>
 
-        <div className="relative z-10 w-full max-w-4xl flex flex-col items-center gap-12">
+        {/* Title for the export (Visible only in board or always? Let's add a small watermark or title) */}
+        <div className="absolute top-6 left-8 z-10 opacity-50">
+           <h4 className="font-rajdhani font-bold text-zinc-600 text-sm tracking-[0.2em] uppercase">TS SCOUT PRO // ROSTER BUILDER</h4>
+        </div>
+
+        <div className="relative z-10 w-full max-w-4xl flex flex-col items-center gap-12 mt-8">
             
             {/* Coach Slot */}
             <div className="flex justify-center w-full">
@@ -259,7 +309,8 @@ const SlotComponent: React.FC<{
                             </span>
                             <button 
                                 onClick={(e) => { e.stopPropagation(); onClear(slot.id); }}
-                                className="absolute top-1/2 -translate-y-1/2 right-0 text-zinc-500 hover:text-red-500 opacity-0 group-hover/name:opacity-100 transition-all bg-zinc-900 p-1 rounded-full"
+                                className="absolute top-1/2 -translate-y-1/2 right-0 text-zinc-500 hover:text-red-500 opacity-0 group-hover/name:opacity-100 transition-all bg-zinc-900 p-1 rounded-full no-print"
+                                data-html2canvas-ignore
                             >
                                 <Trash2 size={12} />
                             </button>
