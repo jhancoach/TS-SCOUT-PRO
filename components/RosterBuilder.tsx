@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { User, Target, Bomb, Crosshair, Crown, Plus, Trash2, MonitorPlay, Download, FilePlus } from 'lucide-react';
+import { User, Target, Bomb, Crosshair, Crown, Plus, Trash2, MonitorPlay, Download, FilePlus, LayoutGrid, List, RectangleHorizontal, RectangleVertical, ArrowDown } from 'lucide-react';
 // @ts-ignore
 import html2canvas from 'html2canvas';
 
@@ -22,20 +22,33 @@ const ROLES = [
 
 export const RosterBuilder: React.FC = () => {
   const [newName, setNewName] = useState('');
+  const [viewType, setViewType] = useState<'LIST' | 'CARDS'>('LIST');
+  const [slotStyle, setSlotStyle] = useState<'PORTRAIT' | 'LANDSCAPE'>('LANDSCAPE'); // Default to Landscape (Card) as per request
+  
   const [availablePlayers, setAvailablePlayers] = useState<string[]>([
     'BLACK', 'FNX', 'GUIME', 'ERICKING', 'PROZIN', 
     'JUCA', 'THEUS7', 'PITBULL', 'NANDO9', 'BYTE33', 
-    'HONEY', 'WLIU', 'LOST', 'CAUAN',
+    'HONEY', 'WLIU', 'LOST', 'CAUAN', 'MOTOVEA',
     'COACH BRN', 'COACH PUTSGRILO'
   ]);
   
   const [slots, setSlots] = useState<RosterSlot[]>([
+    // Coach
     { id: 0, type: 'COACH', label: 'COACH', assignedName: null, assignedRole: 'COACH' },
+    
+    // Main Lineup (Option 1)
     { id: 1, type: 'PLAYER', label: 'JOGADOR 1', assignedName: null, assignedRole: null },
     { id: 2, type: 'PLAYER', label: 'JOGADOR 2', assignedName: null, assignedRole: null },
     { id: 3, type: 'PLAYER', label: 'JOGADOR 3', assignedName: null, assignedRole: null },
     { id: 4, type: 'PLAYER', label: 'JOGADOR 4', assignedName: null, assignedRole: null },
     { id: 5, type: 'PLAYER', label: 'JOGADOR 5', assignedName: null, assignedRole: null },
+
+    // Secondary Lineup (Option 2)
+    { id: 6, type: 'PLAYER', label: 'OPÇÃO 1', assignedName: null, assignedRole: null },
+    { id: 7, type: 'PLAYER', label: 'OPÇÃO 2', assignedName: null, assignedRole: null },
+    { id: 8, type: 'PLAYER', label: 'OPÇÃO 3', assignedName: null, assignedRole: null },
+    { id: 9, type: 'PLAYER', label: 'OPÇÃO 4', assignedName: null, assignedRole: null },
+    { id: 10, type: 'PLAYER', label: 'OPÇÃO 5', assignedName: null, assignedRole: null },
   ]);
 
   const boardRef = useRef<HTMLDivElement>(null);
@@ -86,14 +99,11 @@ export const RosterBuilder: React.FC = () => {
 
   const resetBoard = () => {
     if (window.confirm('Tem certeza que deseja limpar todo o elenco?')) {
-        setSlots([
-            { id: 0, type: 'COACH', label: 'COACH', assignedName: null, assignedRole: 'COACH' },
-            { id: 1, type: 'PLAYER', label: 'JOGADOR 1', assignedName: null, assignedRole: null },
-            { id: 2, type: 'PLAYER', label: 'JOGADOR 2', assignedName: null, assignedRole: null },
-            { id: 3, type: 'PLAYER', label: 'JOGADOR 3', assignedName: null, assignedRole: null },
-            { id: 4, type: 'PLAYER', label: 'JOGADOR 4', assignedName: null, assignedRole: null },
-            { id: 5, type: 'PLAYER', label: 'JOGADOR 5', assignedName: null, assignedRole: null },
-        ]);
+        setSlots(slots.map(s => ({ 
+            ...s, 
+            assignedName: null, 
+            assignedRole: s.type === 'COACH' ? 'COACH' : null 
+        })));
     }
   };
 
@@ -157,27 +167,72 @@ export const RosterBuilder: React.FC = () => {
         </div>
 
         {/* Available Players List */}
-        <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex-1 flex flex-col">
-          <h3 className="text-zinc-400 font-bold uppercase text-xs tracking-widest mb-3">Banco de Reservas</h3>
-          <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
-            {availablePlayers.map((player, idx) => (
-              <div 
-                key={idx}
-                draggable
-                onDragStart={(e) => onDragStart(e, 'NAME', player)}
-                className="group flex justify-between items-center bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-600 p-2 rounded cursor-grab active:cursor-grabbing transition-all"
-              >
-                <div className="flex items-center gap-2">
-                  <User size={14} className="text-zinc-500 group-hover:text-yellow-500" />
-                  <span className="font-rajdhani font-bold text-white">{player}</span>
-                </div>
-                <button onClick={() => removeAvailablePlayer(idx)} className="text-zinc-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Trash2 size={12} />
+        <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex-1 flex flex-col min-h-[400px]">
+          <div className="flex justify-between items-center mb-4">
+             <h3 className="text-zinc-400 font-bold uppercase text-xs tracking-widest">Banco de Reservas</h3>
+             <div className="flex gap-1 bg-zinc-950 p-1 rounded-lg border border-zinc-800">
+                <button 
+                  onClick={() => setViewType('LIST')}
+                  className={`p-1.5 rounded-md transition-all ${viewType === 'LIST' ? 'bg-zinc-800 text-yellow-500' : 'text-zinc-500 hover:text-zinc-300'}`}
+                  title="Lista"
+                >
+                  <List size={14} />
                 </button>
-              </div>
-            ))}
+                <button 
+                  onClick={() => setViewType('CARDS')}
+                  className={`p-1.5 rounded-md transition-all ${viewType === 'CARDS' ? 'bg-zinc-800 text-yellow-500' : 'text-zinc-500 hover:text-zinc-300'}`}
+                  title="Cards"
+                >
+                  <LayoutGrid size={14} />
+                </button>
+             </div>
+          </div>
+          
+          <div className="space-y-2 max-h-[400px] overflow-y-auto custom-scrollbar pr-2 flex-1">
             {availablePlayers.length === 0 && (
               <p className="text-zinc-600 text-xs italic text-center py-4">Sem jogadores disponíveis.</p>
+            )}
+
+            {viewType === 'LIST' ? (
+                // LIST VIEW
+                availablePlayers.map((player, idx) => (
+                    <div 
+                        key={idx}
+                        draggable
+                        onDragStart={(e) => onDragStart(e, 'NAME', player)}
+                        className="group flex justify-between items-center bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-600 p-2 rounded cursor-grab active:cursor-grabbing transition-all"
+                    >
+                        <div className="flex items-center gap-2">
+                        <User size={14} className="text-zinc-500 group-hover:text-yellow-500" />
+                        <span className="font-rajdhani font-bold text-white">{player}</span>
+                        </div>
+                        <button onClick={() => removeAvailablePlayer(idx)} className="text-zinc-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Trash2 size={12} />
+                        </button>
+                    </div>
+                ))
+            ) : (
+                // CARD VIEW
+                <div className="grid grid-cols-2 gap-2">
+                     {availablePlayers.map((player, idx) => (
+                        <div 
+                            key={idx}
+                            draggable
+                            onDragStart={(e) => onDragStart(e, 'NAME', player)}
+                            className="group relative flex flex-col items-center justify-center bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 hover:border-yellow-500/50 p-3 rounded-lg cursor-grab active:cursor-grabbing transition-all aspect-[4/3]"
+                        >
+                             <User size={20} className="text-zinc-600 group-hover:text-yellow-500 mb-2 transition-colors" />
+                             <span className="font-rajdhani font-bold text-white text-xs text-center leading-tight break-words w-full">{player}</span>
+                             
+                             <button 
+                                onClick={() => removeAvailablePlayer(idx)} 
+                                className="absolute top-1 right-1 text-zinc-700 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                             >
+                                <Trash2 size={10} />
+                             </button>
+                        </div>
+                     ))}
+                </div>
             )}
           </div>
         </div>
@@ -211,18 +266,37 @@ export const RosterBuilder: React.FC = () => {
 
         {/* Toolbar - Marked no-print to hide from image capture if desired, though user might want buttons visible? No, usually not. */}
         <div className="absolute top-6 right-6 z-20 flex gap-3 no-print" data-html2canvas-ignore>
+             
+             {/* Style Toggle */}
+             <div className="flex gap-1 bg-zinc-950 p-1 rounded-lg border border-zinc-700 mr-2">
+                <button 
+                  onClick={() => setSlotStyle('PORTRAIT')}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all text-xs font-bold uppercase tracking-wider ${slotStyle === 'PORTRAIT' ? 'bg-zinc-800 text-yellow-500' : 'text-zinc-500 hover:text-zinc-300'}`}
+                  title="Estilo Retrato"
+                >
+                  <RectangleVertical size={14} /> <span className="hidden sm:inline">Retrato</span>
+                </button>
+                <button 
+                  onClick={() => setSlotStyle('LANDSCAPE')}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all text-xs font-bold uppercase tracking-wider ${slotStyle === 'LANDSCAPE' ? 'bg-zinc-800 text-yellow-500' : 'text-zinc-500 hover:text-zinc-300'}`}
+                  title="Estilo Card"
+                >
+                  <RectangleHorizontal size={14} /> <span className="hidden sm:inline">Card</span>
+                </button>
+             </div>
+
              <button 
                 onClick={resetBoard} 
                 className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 hover:border-red-500 hover:text-red-500 text-zinc-400 px-4 py-2 rounded text-xs font-bold uppercase tracking-wider transition-all"
             >
-                <FilePlus size={14} /> Novo Elenco
+                <FilePlus size={14} /> Novo
             </button>
             <button 
                 onClick={handleSavePNG} 
                 disabled={isCapturing}
                 className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 rounded text-xs font-bold uppercase tracking-wider transition-colors shadow-[0_0_15px_rgba(234,179,8,0.2)]"
             >
-                <Download size={14} /> {isCapturing ? 'Gerando...' : 'Salvar PNG'}
+                <Download size={14} /> {isCapturing ? '...' : 'PNG'}
             </button>
         </div>
 
@@ -231,20 +305,43 @@ export const RosterBuilder: React.FC = () => {
            <h4 className="font-rajdhani font-bold text-zinc-600 text-sm tracking-[0.2em] uppercase">TS SCOUT PRO // ROSTER BUILDER</h4>
         </div>
 
-        <div className="relative z-10 w-full max-w-4xl flex flex-col items-center gap-12 mt-8">
+        <div className="relative z-10 w-full max-w-4xl flex flex-col items-center gap-8 mt-8">
             
             {/* Coach Slot */}
-            <div className="flex justify-center w-full">
+            <div className="flex justify-center w-full mb-4">
                 {slots.filter(s => s.type === 'COACH').map(slot => (
-                     <SlotComponent key={slot.id} slot={slot} onDrop={onDrop} onClear={clearSlot} />
+                     <SlotComponent key={slot.id} slot={slot} style={slotStyle} onDrop={onDrop} onClear={clearSlot} />
                 ))}
             </div>
 
-            {/* Players Slots */}
-            <div className="flex flex-wrap justify-center gap-6 md:gap-10 w-full">
-                {slots.filter(s => s.type === 'PLAYER').map(slot => (
-                    <SlotComponent key={slot.id} slot={slot} onDrop={onDrop} onClear={clearSlot} />
-                ))}
+            {/* Players Slots - ROW 1 (MAIN) */}
+            <div className="w-full flex flex-col gap-2 items-center">
+                <div className="w-full flex items-center gap-4 mb-2">
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-zinc-800 to-transparent"></div>
+                    <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em]">Lineup Principal</span>
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-zinc-800 to-transparent"></div>
+                </div>
+                <div className={`flex flex-wrap justify-center w-full ${slotStyle === 'PORTRAIT' ? 'gap-6 md:gap-10' : 'gap-4'}`}>
+                    {slots.filter(s => s.type === 'PLAYER' && s.id <= 5).map(slot => (
+                        <SlotComponent key={slot.id} slot={slot} style={slotStyle} onDrop={onDrop} onClear={clearSlot} />
+                    ))}
+                </div>
+            </div>
+
+            {/* Players Slots - ROW 2 (OPTION 2) */}
+            <div className="w-full flex flex-col gap-2 items-center mt-4">
+                 <div className="w-full flex items-center gap-4 mb-2 opacity-50">
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-zinc-800 to-transparent"></div>
+                    <span className="text-zinc-600 text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-1">
+                        <ArrowDown size={10} /> Opção 2 / Reservas
+                    </span>
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-zinc-800 to-transparent"></div>
+                </div>
+                <div className={`flex flex-wrap justify-center w-full opacity-80 hover:opacity-100 transition-opacity ${slotStyle === 'PORTRAIT' ? 'gap-6 md:gap-10' : 'gap-4'}`}>
+                    {slots.filter(s => s.type === 'PLAYER' && s.id > 5).map(slot => (
+                        <SlotComponent key={slot.id} slot={slot} style={slotStyle} onDrop={onDrop} onClear={clearSlot} />
+                    ))}
+                </div>
             </div>
 
         </div>
@@ -256,9 +353,10 @@ export const RosterBuilder: React.FC = () => {
 
 const SlotComponent: React.FC<{ 
     slot: RosterSlot; 
+    style: 'PORTRAIT' | 'LANDSCAPE';
     onDrop: (e: React.DragEvent, id: number) => void;
     onClear: (id: number) => void;
-}> = ({ slot, onDrop, onClear }) => {
+}> = ({ slot, style, onDrop, onClear }) => {
     
     // Find role color
     const roleConfig = ROLES.find(r => r.label === slot.assignedRole);
@@ -270,6 +368,63 @@ const SlotComponent: React.FC<{
     const nameLength = slot.assignedName?.length || 0;
     const textSizeClass = nameLength > 12 ? 'text-sm' : 'text-xl';
 
+    if (style === 'LANDSCAPE') {
+        return (
+            <div 
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => onDrop(e, slot.id)}
+                className={`
+                    relative w-64 h-24 flex items-center bg-zinc-950 rounded-xl border-2 transition-all duration-300 group
+                    ${slot.assignedName ? 'border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.15)]' : 'border-zinc-800 border-dashed opacity-80 hover:opacity-100'}
+                `}
+            >
+                 {/* Left: Icon Area */}
+                 <div className={`
+                    w-20 h-full flex items-center justify-center border-r transition-colors
+                    ${slot.assignedName ? 'border-yellow-500/30 bg-yellow-500/5' : 'border-zinc-800 bg-zinc-900/50'}
+                 `}>
+                    {slot.type === 'COACH' ? 
+                        <MonitorPlay size={32} className={slot.assignedName ? "text-yellow-500" : "text-zinc-700"} /> : 
+                        <User size={40} className={slot.assignedName ? "text-yellow-500" : "text-zinc-700"} />
+                    }
+                 </div>
+
+                 {/* Right: Info Area */}
+                 <div className="flex-1 h-full flex flex-col justify-center px-4 relative overflow-hidden">
+                    {/* Role Badge (Top Right absolute) */}
+                    <div className={`
+                        absolute top-2 right-2 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border
+                        ${slot.assignedRole ? `${bgColor} ${borderColor} ${textColor} border-opacity-50` : 'bg-zinc-900 border-zinc-700 text-zinc-600'}
+                    `}>
+                        {slot.assignedRole || 'FUNÇÃO'}
+                    </div>
+
+                    {slot.assignedName ? (
+                        <>
+                            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-0.5">Player</span>
+                            <span className={`font-rajdhani font-bold text-white leading-none ${textSizeClass}`}>
+                                {slot.assignedName}
+                            </span>
+                            
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); onClear(slot.id); }}
+                                className="absolute bottom-2 right-2 text-zinc-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all no-print"
+                                data-html2canvas-ignore
+                            >
+                                <Trash2 size={12} />
+                            </button>
+                        </>
+                    ) : (
+                        <span className="text-zinc-600 text-xs font-bold uppercase tracking-wider">
+                            Arraste Nome
+                        </span>
+                    )}
+                 </div>
+            </div>
+        );
+    }
+
+    // Default PORTRAIT Style
     return (
         <div 
             onDragOver={(e) => e.preventDefault()}
