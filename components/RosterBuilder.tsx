@@ -107,7 +107,7 @@ export const RosterBuilder: React.FC = () => {
                 scale: 2, // High resolution
                 logging: false,
                 useCORS: true,
-                ignoreElements: (element) => {
+                ignoreElements: (element: Element) => {
                    // Ignore elements with class 'no-print'
                    return element.classList.contains('no-print');
                 }
