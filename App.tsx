@@ -7,7 +7,8 @@ import { IntroSlide } from './components/IntroSlide';
 import { TeamBuilder } from './components/TeamBuilder';
 import { AdminLogin } from './components/AdminLogin';
 import { Presentation } from './components/Presentation';
-import { LayoutGrid, Target, Zap, Home, Lock, LogOut, BarChart2, Presentation as PresentationIcon } from 'lucide-react';
+import { RosterBuilder } from './components/RosterBuilder';
+import { LayoutGrid, Target, Zap, Home, Lock, LogOut, BarChart2, Presentation as PresentationIcon, Users } from 'lucide-react';
 
 const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>(ViewMode.INTRO);
@@ -88,6 +89,15 @@ const App: React.FC = () => {
              >
                <Home size={14} />
                <span className="hidden sm:inline">Início</span>
+             </button>
+
+             {/* Roster Builder Button (New) */}
+             <button 
+               onClick={() => setViewMode(ViewMode.ROSTER_BUILDER)}
+               className={`flex items-center gap-2 transition-colors uppercase font-bold tracking-wider text-xs border px-4 py-2 rounded-sm ${viewMode === ViewMode.ROSTER_BUILDER ? 'bg-yellow-500 text-black border-yellow-500' : 'bg-zinc-900 text-zinc-500 border-zinc-800 hover:text-yellow-500 hover:border-yellow-500/50'}`}
+             >
+               <Users size={14} />
+               <span className="hidden sm:inline">Montar Elenco</span>
              </button>
 
              {/* Presentation Button */}
@@ -218,6 +228,10 @@ const App: React.FC = () => {
             onSave={handleSaveCustomTeam} 
             onCancel={() => setViewMode(ViewMode.DASHBOARD)} 
           />
+        )}
+        
+        {viewMode === ViewMode.ROSTER_BUILDER && (
+          <RosterBuilder />
         )}
 
       </main>
