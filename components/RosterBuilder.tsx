@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { User, Target, Bomb, Crosshair, Crown, Plus, Trash2, MonitorPlay, Download, FilePlus, LayoutGrid, List, RectangleHorizontal, RectangleVertical, ArrowDown, Camera, Upload, Copy, Save, Image as ImageIcon, X, ChevronRight, Undo, Redo, HelpCircle, Info, MousePointerClick, Move } from 'lucide-react';
+import { User, Target, Bomb, Crosshair, Crown, Plus, Trash2, MonitorPlay, Download, FilePlus, LayoutGrid, List, RectangleHorizontal, RectangleVertical, ArrowDown, Camera, Upload, Copy, Save, Image as ImageIcon, X, ChevronRight, Undo, Redo, HelpCircle, Info, MousePointerClick, Move, Tag } from 'lucide-react';
 // @ts-ignore
 import html2canvas from 'html2canvas';
 
@@ -10,6 +10,7 @@ interface RosterSlot {
   assignedName: string | null;
   assignedRole: string | null;
   assignedImage: string | null;
+  assignedCharacteristic: string | null;
 }
 
 interface SavedRoster {
@@ -31,20 +32,20 @@ const ROLES = [
 
 const INITIAL_SLOTS: RosterSlot[] = [
     // Coach
-    { id: 0, type: 'COACH', label: 'COACH', assignedName: null, assignedRole: 'COACH', assignedImage: null },
+    { id: 0, type: 'COACH', label: 'COACH', assignedName: null, assignedRole: 'COACH', assignedImage: null, assignedCharacteristic: null },
     
     // Main Lineup (Reduced to 4)
-    { id: 1, type: 'PLAYER', label: 'JOGADOR 1', assignedName: null, assignedRole: null, assignedImage: null },
-    { id: 2, type: 'PLAYER', label: 'JOGADOR 2', assignedName: null, assignedRole: null, assignedImage: null },
-    { id: 3, type: 'PLAYER', label: 'JOGADOR 3', assignedName: null, assignedRole: null, assignedImage: null },
-    { id: 4, type: 'PLAYER', label: 'JOGADOR 4', assignedName: null, assignedRole: null, assignedImage: null },
+    { id: 1, type: 'PLAYER', label: 'JOGADOR 1', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null },
+    { id: 2, type: 'PLAYER', label: 'JOGADOR 2', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null },
+    { id: 3, type: 'PLAYER', label: 'JOGADOR 3', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null },
+    { id: 4, type: 'PLAYER', label: 'JOGADOR 4', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null },
     
     // Secondary Lineup / Reserves
-    { id: 6, type: 'PLAYER', label: 'OPÇÃO 1', assignedName: null, assignedRole: null, assignedImage: null },
-    { id: 7, type: 'PLAYER', label: 'OPÇÃO 2', assignedName: null, assignedRole: null, assignedImage: null },
-    { id: 8, type: 'PLAYER', label: 'OPÇÃO 3', assignedName: null, assignedRole: null, assignedImage: null },
-    { id: 9, type: 'PLAYER', label: 'OPÇÃO 4', assignedName: null, assignedRole: null, assignedImage: null },
-    { id: 10, type: 'PLAYER', label: 'OPÇÃO 5', assignedName: null, assignedRole: null, assignedImage: null },
+    { id: 6, type: 'PLAYER', label: 'OPÇÃO 1', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null },
+    { id: 7, type: 'PLAYER', label: 'OPÇÃO 2', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null },
+    { id: 8, type: 'PLAYER', label: 'OPÇÃO 3', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null },
+    { id: 9, type: 'PLAYER', label: 'OPÇÃO 4', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null },
+    { id: 10, type: 'PLAYER', label: 'OPÇÃO 5', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null },
 ];
 
 export const RosterBuilder: React.FC = () => {
@@ -138,13 +139,15 @@ export const RosterBuilder: React.FC = () => {
     assignDataToSlot(slotId, data.type, data.value);
   };
 
-  const assignDataToSlot = (slotId: number, type: 'NAME' | 'ROLE', value: string) => {
+  const assignDataToSlot = (slotId: number, type: 'NAME' | 'ROLE' | 'CHARACTERISTIC', value: string) => {
     const newSlots = slots.map(slot => {
       if (slot.id === slotId) {
         if (type === 'NAME') {
           return { ...slot, assignedName: value };
         } else if (type === 'ROLE') {
           return { ...slot, assignedRole: value };
+        } else if (type === 'CHARACTERISTIC') {
+          return { ...slot, assignedCharacteristic: value };
         }
       }
       return slot;
@@ -160,7 +163,10 @@ export const RosterBuilder: React.FC = () => {
   const handleSelectionFromModal = (type: 'NAME' | 'ROLE', value: string) => {
     if (activeSlotId !== null) {
         assignDataToSlot(activeSlotId, type, value);
-        if(type === 'NAME') setActiveSlotId(null);
+        if(type === 'NAME') {
+            // Optional: Close modal on name select? 
+            // setActiveSlotId(null);
+        }
     }
   };
 
@@ -191,7 +197,8 @@ export const RosterBuilder: React.FC = () => {
         ...s, 
         assignedName: null, 
         assignedRole: s.type === 'COACH' ? 'COACH' : null,
-        assignedImage: null
+        assignedImage: null,
+        assignedCharacteristic: null
     } : s);
     updateBoardState(newSlots);
   };
@@ -212,7 +219,8 @@ export const RosterBuilder: React.FC = () => {
             ...s,
             assignedName: sourceSlot.assignedName,
             assignedRole: sourceSlot.assignedRole,
-            assignedImage: sourceSlot.assignedImage
+            assignedImage: sourceSlot.assignedImage,
+            assignedCharacteristic: sourceSlot.assignedCharacteristic
         } : s);
         updateBoardState(newSlots);
     } else {
@@ -251,7 +259,8 @@ export const RosterBuilder: React.FC = () => {
             ...s, 
             assignedName: null, 
             assignedRole: s.type === 'COACH' ? 'COACH' : null,
-            assignedImage: null
+            assignedImage: null,
+            assignedCharacteristic: null
         }));
         updateBoardState(newSlots);
         setRosterName('NOME DO ELENCO');
@@ -286,6 +295,9 @@ export const RosterBuilder: React.FC = () => {
         }
     }
   };
+
+  // Helper to get active slot for modal rendering
+  const activeSlot = activeSlotId !== null ? slots.find(s => s.id === activeSlotId) : null;
 
   return (
     <div className="animate-fade-in grid grid-cols-1 lg:grid-cols-4 gap-8 min-h-[calc(100vh-140px)]">
@@ -683,6 +695,7 @@ export const RosterBuilder: React.FC = () => {
                                 <p className="text-zinc-400 text-sm">
                                     Clique no <strong>ícone do boneco</strong> dentro do card para fazer upload da foto do jogador.
                                     Clique na área do <strong>Logo</strong> no topo para adicionar o escudo do time.
+                                    <strong>NOVO:</strong> Adicione uma "palavra-chave" (ex: IGL, Bala) no menu de edição.
                                 </p>
                             </div>
                         </div>
@@ -720,9 +733,9 @@ export const RosterBuilder: React.FC = () => {
       )}
 
       {/* SELECTION MODAL (MOBILE/DESKTOP) */}
-      {activeSlotId !== null && (
+      {activeSlotId !== null && activeSlot && (
         <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-fade-in">
-            <div className="bg-zinc-900 w-full max-w-lg rounded-t-2xl sm:rounded-2xl border border-zinc-800 shadow-2xl flex flex-col max-h-[80vh]">
+            <div className="bg-zinc-900 w-full max-w-lg rounded-t-2xl sm:rounded-2xl border border-zinc-800 shadow-2xl flex flex-col max-h-[90vh]">
                 <div className="p-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-950 rounded-t-2xl">
                     <h3 className="font-rajdhani font-bold text-xl text-white uppercase flex items-center gap-2">
                         <Target size={18} className="text-yellow-500" /> Editar Slot
@@ -744,7 +757,10 @@ export const RosterBuilder: React.FC = () => {
                                 <button
                                     key={idx}
                                     onClick={() => handleSelectionFromModal('NAME', player)}
-                                    className="bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 hover:border-yellow-500/50 p-2 rounded text-sm font-bold font-rajdhani text-white text-left transition-all"
+                                    className={`
+                                        bg-zinc-950 hover:bg-zinc-800 border p-2 rounded text-sm font-bold font-rajdhani text-left transition-all
+                                        ${activeSlot.assignedName === player ? 'border-yellow-500 text-yellow-500' : 'border-zinc-800 hover:border-yellow-500/50 text-white'}
+                                    `}
                                 >
                                     {player}
                                 </button>
@@ -760,19 +776,36 @@ export const RosterBuilder: React.FC = () => {
                                 <button
                                     key={role.id}
                                     onClick={() => handleSelectionFromModal('ROLE', role.label)}
-                                    className={`p-2 rounded border flex items-center gap-2 transition-all text-xs font-bold ${role.color.replace('bg-', 'bg-opacity-10 bg-')}`}
+                                    className={`p-2 rounded border flex items-center gap-2 transition-all text-xs font-bold ${role.color.replace('bg-', 'bg-opacity-10 bg-')} ${activeSlot.assignedRole === role.label ? 'ring-1 ring-white' : ''}`}
                                 >
                                     {role.icon} {role.label}
                                 </button>
                             ))}
                         </div>
                     </div>
+
+                    {/* Characteristic Input Section (NEW) */}
+                    <div>
+                         <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <Tag size={12} /> Definição (1 Palavra)
+                         </h4>
+                         <input 
+                            type="text" 
+                            maxLength={15}
+                            placeholder="EX: BALA, IGL, SUPORTE..."
+                            value={activeSlot.assignedCharacteristic || ''}
+                            onChange={(e) => assignDataToSlot(activeSlotId, 'CHARACTERISTIC', e.target.value.toUpperCase())}
+                            className="w-full bg-zinc-950 border border-zinc-800 rounded p-3 text-white font-rajdhani font-bold focus:border-yellow-500 focus:outline-none uppercase tracking-wider"
+                         />
+                         <p className="text-[10px] text-zinc-600 mt-1 italic">Aparecerá como uma tag no card do jogador.</p>
+                    </div>
+
                 </div>
                 
                  <div className="p-4 bg-zinc-950 border-t border-zinc-800 rounded-b-2xl">
                     <button 
                         onClick={() => setActiveSlotId(null)}
-                        className="w-full bg-yellow-500 text-black font-bold py-3 rounded font-rajdhani uppercase tracking-wider"
+                        className="w-full bg-yellow-500 text-black font-bold py-3 rounded font-rajdhani uppercase tracking-wider hover:bg-yellow-400 transition-colors"
                     >
                         Concluir
                     </button>
@@ -875,11 +908,18 @@ const SlotComponent: React.FC<{
                     </div>
 
                     {slot.assignedName ? (
-                        <>
+                        <div className="flex flex-col">
                             <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-0.5">Player</span>
                             <span className={`font-rajdhani font-bold text-white leading-none ${textSizeClass}`}>
                                 {slot.assignedName}
                             </span>
+                            
+                            {/* Characteristic Tag */}
+                            {slot.assignedCharacteristic && (
+                                <span className="text-[9px] text-yellow-500 font-bold uppercase tracking-widest mt-1">
+                                    // {slot.assignedCharacteristic}
+                                </span>
+                            )}
                             
                             {/* Actions Group (No Print) */}
                             <div className="absolute bottom-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-all no-print" data-html2canvas-ignore>
@@ -898,7 +938,7 @@ const SlotComponent: React.FC<{
                                     <Trash2 size={10} />
                                 </button>
                             </div>
-                        </>
+                        </div>
                     ) : (
                         <span className="text-zinc-600 text-xs font-bold uppercase tracking-wider">
                             Toque para Editar
@@ -972,10 +1012,17 @@ const SlotComponent: React.FC<{
                     title="Clique para editar nome"
                 >
                     {slot.assignedName ? (
-                        <div className="group/name relative w-full px-2">
+                        <div className="group/name relative w-full px-2 flex flex-col items-center">
                              <span className={`font-rajdhani font-bold text-white block leading-tight break-words ${textSizeClass}`}>
                                 {slot.assignedName}
                             </span>
+                            
+                            {/* Characteristic Tag */}
+                            {slot.assignedCharacteristic && (
+                                <span className="text-[9px] text-yellow-500 font-bold uppercase tracking-widest mt-1">
+                                    {slot.assignedCharacteristic}
+                                </span>
+                            )}
                             
                              {/* Actions Group (No Print) */}
                             <div className="absolute top-1/2 -translate-y-1/2 right-0 flex flex-col gap-1 opacity-0 group-hover/name:opacity-100 transition-all no-print bg-zinc-900/80 p-1 rounded-l-md" data-html2canvas-ignore>
