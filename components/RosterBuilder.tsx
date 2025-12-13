@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { User, Target, Bomb, Crosshair, Crown, Plus, Trash2, MonitorPlay, Download, FilePlus, LayoutGrid, List, RectangleHorizontal, RectangleVertical, ArrowDown, Camera, Upload, Copy, Save, Image as ImageIcon, X, ChevronRight, Undo, Redo, HelpCircle, Info, MousePointerClick, Move, Tag, ScanEye, Banknote, Wallet } from 'lucide-react';
+import { User, Target, Bomb, Crosshair, Crown, Plus, Trash2, MonitorPlay, Download, FilePlus, LayoutGrid, List, RectangleHorizontal, RectangleVertical, ArrowDown, Camera, Upload, Copy, Save, Image as ImageIcon, X, Undo, Redo, HelpCircle, Info, MousePointerClick, Move, Tag, ScanEye, Banknote, Wallet } from 'lucide-react';
 // @ts-ignore
 import html2canvas from 'html2canvas';
 
@@ -1021,7 +1021,7 @@ const SlotComponent: React.FC<{
                             {slot.label}
                         </span>
                     )}
-                 </div>
+                </div>
             </div>
         );
     }
