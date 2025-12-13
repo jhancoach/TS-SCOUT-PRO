@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { User, Target, Bomb, Crosshair, Crown, Plus, Trash2, MonitorPlay, Download, FilePlus, LayoutGrid, List, RectangleHorizontal, RectangleVertical, ArrowDown, Camera, Upload, Copy, Save, Image as ImageIcon, X, ChevronRight, Undo, Redo } from 'lucide-react';
+import { User, Target, Bomb, Crosshair, Crown, Plus, Trash2, MonitorPlay, Download, FilePlus, LayoutGrid, List, RectangleHorizontal, RectangleVertical, ArrowDown, Camera, Upload, Copy, Save, Image as ImageIcon, X, ChevronRight, Undo, Redo, HelpCircle, Info, MousePointerClick, Move } from 'lucide-react';
 // @ts-ignore
 import html2canvas from 'html2canvas';
 
@@ -53,6 +53,7 @@ export const RosterBuilder: React.FC = () => {
   const [teamLogo, setTeamLogo] = useState<string | null>(null);
   const [viewType, setViewType] = useState<'LIST' | 'CARDS'>('LIST');
   const [slotStyle, setSlotStyle] = useState<'PORTRAIT' | 'LANDSCAPE'>('LANDSCAPE');
+  const [showHelp, setShowHelp] = useState(false);
   
   // Mobile/Click Selection State
   const [activeSlotId, setActiveSlotId] = useState<number | null>(null);
@@ -293,7 +294,10 @@ export const RosterBuilder: React.FC = () => {
       <div className="lg:col-span-1 space-y-6 no-print">
         
         {/* Name Input */}
-        <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl">
+        <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl relative group">
+          <div className="absolute -top-3 left-4 bg-zinc-900 px-2 text-zinc-500 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+             <Info size={10} /> Passo 1
+          </div>
           <h3 className="text-zinc-400 font-bold uppercase text-xs tracking-widest mb-3 flex items-center gap-2">
             <Plus size={14} /> Adicionar Jogador
           </h3>
@@ -303,16 +307,18 @@ export const RosterBuilder: React.FC = () => {
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="NICKNAME"
+              placeholder="DIGITE O NICK"
               className="flex-1 bg-zinc-950 border border-zinc-700 rounded p-2 text-white text-sm focus:border-yellow-500 focus:outline-none font-rajdhani font-bold uppercase"
             />
             <button 
               onClick={handleAddPlayer}
               className="bg-yellow-500 hover:bg-yellow-400 text-black p-2 rounded transition-colors"
+              title="Adicionar à lista"
             >
               <Plus size={18} />
             </button>
           </div>
+          <p className="text-[10px] text-zinc-600 mt-2 italic">Adicione o nome para o banco de reservas abaixo.</p>
         </div>
 
         {/* Saved Rosters */}
@@ -346,7 +352,10 @@ export const RosterBuilder: React.FC = () => {
         </div>
 
         {/* Available Players List */}
-        <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex-1 flex flex-col min-h-[300px]">
+        <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl flex-1 flex flex-col min-h-[300px] relative">
+          <div className="absolute -top-3 left-4 bg-zinc-900 px-2 text-zinc-500 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+             <Info size={10} /> Passo 2
+          </div>
           <div className="flex justify-between items-center mb-4">
              <h3 className="text-zinc-400 font-bold uppercase text-xs tracking-widest">Banco de Reservas</h3>
              <div className="flex gap-1 bg-zinc-950 p-1 rounded-lg border border-zinc-800">
@@ -369,7 +378,7 @@ export const RosterBuilder: React.FC = () => {
           
           <div className="space-y-2 max-h-[400px] overflow-y-auto custom-scrollbar pr-2 flex-1">
             {availablePlayers.length === 0 && (
-              <p className="text-zinc-600 text-xs italic text-center py-4">Sem jogadores disponíveis.</p>
+              <p className="text-zinc-600 text-xs italic text-center py-4">Sem jogadores disponíveis. Adicione no campo acima.</p>
             )}
 
             {viewType === 'LIST' ? (
@@ -414,10 +423,16 @@ export const RosterBuilder: React.FC = () => {
                 </div>
             )}
           </div>
+          <p className="text-[10px] text-zinc-600 mt-2 text-center border-t border-zinc-800 pt-2">
+            Arraste para os slots ou clique no slot para selecionar
+          </p>
         </div>
 
         {/* Roles Palette */}
-        <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl">
+        <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-xl relative">
+          <div className="absolute -top-3 left-4 bg-zinc-900 px-2 text-zinc-500 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+             <Info size={10} /> Passo 3
+          </div>
           <h3 className="text-zinc-400 font-bold uppercase text-xs tracking-widest mb-3">Funções (Arraste)</h3>
           <div className="grid grid-cols-2 gap-2">
             {ROLES.map((role) => (
@@ -445,6 +460,15 @@ export const RosterBuilder: React.FC = () => {
 
         {/* Toolbar - Improved responsiveness */}
         <div className="absolute top-4 right-4 z-20 flex flex-wrap justify-end gap-2 no-print" data-html2canvas-ignore>
+             {/* Help Button */}
+             <button 
+                onClick={() => setShowHelp(true)}
+                className="flex items-center gap-2 bg-zinc-900 border border-zinc-700 hover:border-yellow-500 hover:text-yellow-500 text-zinc-400 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all mr-2"
+                title="Como usar"
+             >
+                <HelpCircle size={14} /> <span className="hidden sm:inline">Ajuda</span>
+             </button>
+
              {/* Undo/Redo Controls */}
              <div className="flex gap-1 bg-zinc-950 p-1 rounded-lg border border-zinc-700 mr-2">
                 <button 
@@ -508,6 +532,7 @@ export const RosterBuilder: React.FC = () => {
                 <div 
                     className="relative w-20 h-20 md:w-24 md:h-24 shrink-0 rounded-xl border-2 border-dashed border-zinc-700 hover:border-yellow-500 bg-zinc-950 flex items-center justify-center cursor-pointer group overflow-hidden transition-all"
                     onClick={() => logoInputRef.current?.click()}
+                    title="Clique para adicionar o Logo do Time"
                 >
                     <input 
                         type="file" 
@@ -539,6 +564,7 @@ export const RosterBuilder: React.FC = () => {
                         onChange={(e) => setRosterName(e.target.value.toUpperCase())}
                         className="w-full bg-transparent text-2xl sm:text-3xl md:text-5xl font-black font-rajdhani text-white uppercase tracking-tight focus:outline-none focus:border-b focus:border-yellow-500 placeholder-zinc-700 text-center md:text-left"
                         placeholder="NOME DO ELENCO"
+                        title="Clique para editar o nome do elenco"
                     />
                     <p className="text-zinc-500 text-[10px] md:text-sm font-bold tracking-[0.3em] uppercase mt-1">
                         TS SCOUT PRO // ROSTER BUILDER
@@ -615,6 +641,83 @@ export const RosterBuilder: React.FC = () => {
 
         </div>
       </div>
+
+      {/* HELP GUIDE MODAL */}
+      {showHelp && (
+        <div className="fixed inset-0 z-[60] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in" onClick={() => setShowHelp(false)}>
+            <div className="bg-zinc-900 w-full max-w-2xl rounded-2xl border border-zinc-800 shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
+                <div className="p-6 border-b border-zinc-800 flex justify-between items-center bg-zinc-950">
+                    <h3 className="font-rajdhani font-bold text-2xl text-white uppercase flex items-center gap-3">
+                        <HelpCircle className="text-yellow-500" /> Guia Rápido
+                    </h3>
+                    <button onClick={() => setShowHelp(false)} className="text-zinc-500 hover:text-white p-2">
+                        <X size={24} />
+                    </button>
+                </div>
+                
+                <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8 overflow-y-auto max-h-[70vh]">
+                    <div className="space-y-4">
+                        <div className="flex gap-4">
+                            <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-yellow-500 shrink-0 font-bold">1</div>
+                            <div>
+                                <h4 className="text-white font-bold uppercase mb-1">Adicione Jogadores</h4>
+                                <p className="text-zinc-400 text-sm">Digite o nickname na barra lateral esquerda e clique em <strong>+</strong> para adicionar ao Banco de Reservas.</p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-yellow-500 shrink-0 font-bold">2</div>
+                            <div>
+                                <h4 className="text-white font-bold uppercase mb-1">Preencha o Elenco</h4>
+                                <p className="text-zinc-400 text-sm">
+                                    <span className="flex items-center gap-1 mb-1"><Move size={12}/> <strong>PC:</strong> Arraste o nome e a função para o slot.</span>
+                                    <span className="flex items-center gap-1"><MousePointerClick size={12}/> <strong>Mobile:</strong> Toque no slot para abrir o menu de seleção rápida.</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-yellow-500 shrink-0 font-bold">3</div>
+                            <div>
+                                <h4 className="text-white font-bold uppercase mb-1">Personalize</h4>
+                                <p className="text-zinc-400 text-sm">
+                                    Clique no <strong>ícone do boneco</strong> dentro do card para fazer upload da foto do jogador.
+                                    Clique na área do <strong>Logo</strong> no topo para adicionar o escudo do time.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div className="bg-zinc-950 p-4 rounded-lg border border-zinc-800">
+                             <h4 className="text-zinc-500 text-xs font-bold uppercase tracking-widest mb-3">Atalhos e Ícones</h4>
+                             <ul className="space-y-2 text-sm text-zinc-300">
+                                <li className="flex items-center gap-2"><Copy size={14} className="text-zinc-500" /> <strong>Duplicar:</strong> Copia o jogador para o próximo slot vazio.</li>
+                                <li className="flex items-center gap-2"><Trash2 size={14} className="text-zinc-500" /> <strong>Limpar:</strong> Remove nome, foto e função do slot.</li>
+                                <li className="flex items-center gap-2"><Undo size={14} className="text-zinc-500" /> <strong>Desfazer:</strong> Reverte a última ação.</li>
+                                <li className="flex items-center gap-2"><Download size={14} className="text-yellow-500" /> <strong>PNG:</strong> Baixa a imagem em alta qualidade.</li>
+                             </ul>
+                        </div>
+                        
+                        <div className="bg-yellow-500/10 p-4 rounded-lg border border-yellow-500/20">
+                            <p className="text-yellow-500 text-xs font-bold uppercase text-center">
+                                Dica Pro: Use o botão "Salvar Atual" para guardar diferentes variações de elenco e carregar depois.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div className="p-4 bg-zinc-950 border-t border-zinc-800 flex justify-end">
+                    <button 
+                        onClick={() => setShowHelp(false)}
+                        className="px-6 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded font-bold uppercase text-sm transition-colors"
+                    >
+                        Entendi
+                    </button>
+                </div>
+            </div>
+        </div>
+      )}
 
       {/* SELECTION MODAL (MOBILE/DESKTOP) */}
       {activeSlotId !== null && (
@@ -733,6 +836,7 @@ const SlotComponent: React.FC<{
                         w-20 h-full flex items-center justify-center border-r transition-colors overflow-hidden relative cursor-pointer group/icon shrink-0
                         ${slot.assignedName ? 'border-yellow-500/30 bg-yellow-500/5' : 'border-zinc-800 bg-zinc-900/50'}
                     `}
+                    title="Clique para adicionar foto"
                  >
                     <input 
                         type="file" 
@@ -760,6 +864,7 @@ const SlotComponent: React.FC<{
                  <div 
                     onClick={() => onSlotClick(slot.id)}
                     className="flex-1 h-full flex flex-col justify-center px-4 relative overflow-hidden cursor-pointer hover:bg-zinc-900/50 transition-colors"
+                    title="Clique para editar nome/função"
                  >
                     {/* Role Badge (Top Right absolute) */}
                     <div className={`
@@ -821,6 +926,7 @@ const SlotComponent: React.FC<{
                     absolute -top-3 z-20 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border shadow-lg cursor-pointer
                     ${slot.assignedRole ? `${bgColor} ${borderColor} ${textColor} border-opacity-50` : 'bg-zinc-950 border-zinc-800 text-zinc-600'}
                 `}
+                title="Clique para alterar função"
             >
                 {slot.assignedRole || 'FUNÇÃO'}
             </div>
@@ -834,6 +940,7 @@ const SlotComponent: React.FC<{
                 <div 
                     onClick={triggerFileInput}
                     className="absolute inset-0 flex items-center justify-center text-zinc-800 group-hover:text-zinc-700 transition-colors cursor-pointer group/icon bg-zinc-950/50"
+                    title="Clique para adicionar foto"
                 >
                      <input 
                         type="file" 
@@ -862,6 +969,7 @@ const SlotComponent: React.FC<{
                         w-full py-4 min-h-[64px] flex items-center justify-center text-center z-10 border-t transition-colors cursor-pointer hover:bg-zinc-900
                         ${slot.assignedName ? 'bg-zinc-900/90 border-yellow-500/50' : 'bg-zinc-950/90 border-zinc-800'}
                     `}
+                    title="Clique para editar nome"
                 >
                     {slot.assignedName ? (
                         <div className="group/name relative w-full px-2">
