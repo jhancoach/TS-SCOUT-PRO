@@ -1,16 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { User, Target, Bomb, Crosshair, Crown, Plus, Trash2, MonitorPlay, Download, FilePlus, LayoutGrid, List, RectangleHorizontal, RectangleVertical, ArrowDown, Camera, Upload, Copy, Save, Image as ImageIcon, X, ChevronRight, Undo, Redo, HelpCircle, Info, MousePointerClick, Move, Tag } from 'lucide-react';
+import { User, Target, Bomb, Crosshair, Crown, Plus, Trash2, MonitorPlay, Download, FilePlus, LayoutGrid, List, RectangleHorizontal, RectangleVertical, ArrowDown, Camera, Upload, Copy, Save, Image as ImageIcon, X, ChevronRight, Undo, Redo, HelpCircle, Info, MousePointerClick, Move, Tag, ScanEye, Banknote, Wallet } from 'lucide-react';
 // @ts-ignore
 import html2canvas from 'html2canvas';
 
 interface RosterSlot {
   id: number;
-  type: 'PLAYER' | 'COACH';
+  type: 'PLAYER' | 'STAFF'; // Changed COACH to STAFF to include Analyst
   label: string;
   assignedName: string | null;
   assignedRole: string | null;
   assignedImage: string | null;
   assignedCharacteristic: string | null;
+  assignedSalary: number | null; // New field
 }
 
 interface SavedRoster {
@@ -28,25 +29,32 @@ const ROLES = [
   { id: 'bomba', label: 'BOMBA', icon: <Bomb size={14} />, color: 'bg-orange-500/20 border-orange-500 text-orange-500' },
   { id: 'sniper', label: 'SNIPER', icon: <Crosshair size={14} />, color: 'bg-cyan-500/20 border-cyan-500 text-cyan-500' },
   { id: 'coach', label: 'COACH', icon: <MonitorPlay size={14} />, color: 'bg-purple-500/20 border-purple-500 text-purple-500' },
+  { id: 'analyst', label: 'ANALISTA', icon: <ScanEye size={14} />, color: 'bg-blue-500/20 border-blue-500 text-blue-500' },
 ];
 
 const INITIAL_SLOTS: RosterSlot[] = [
-    // Coach
-    { id: 0, type: 'COACH', label: 'COACH', assignedName: null, assignedRole: 'COACH', assignedImage: null, assignedCharacteristic: null },
+    // Staff (Coach & Analyst)
+    { id: 0, type: 'STAFF', label: 'COACH', assignedName: null, assignedRole: 'COACH', assignedImage: null, assignedCharacteristic: null, assignedSalary: null },
+    { id: 11, type: 'STAFF', label: 'ANALISTA', assignedName: null, assignedRole: 'ANALISTA', assignedImage: null, assignedCharacteristic: null, assignedSalary: null },
     
     // Main Lineup (Reduced to 4)
-    { id: 1, type: 'PLAYER', label: 'JOGADOR 1', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null },
-    { id: 2, type: 'PLAYER', label: 'JOGADOR 2', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null },
-    { id: 3, type: 'PLAYER', label: 'JOGADOR 3', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null },
-    { id: 4, type: 'PLAYER', label: 'JOGADOR 4', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null },
+    { id: 1, type: 'PLAYER', label: 'JOGADOR 1', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null, assignedSalary: null },
+    { id: 2, type: 'PLAYER', label: 'JOGADOR 2', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null, assignedSalary: null },
+    { id: 3, type: 'PLAYER', label: 'JOGADOR 3', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null, assignedSalary: null },
+    { id: 4, type: 'PLAYER', label: 'JOGADOR 4', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null, assignedSalary: null },
     
     // Secondary Lineup / Reserves
-    { id: 6, type: 'PLAYER', label: 'OPÇÃO 1', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null },
-    { id: 7, type: 'PLAYER', label: 'OPÇÃO 2', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null },
-    { id: 8, type: 'PLAYER', label: 'OPÇÃO 3', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null },
-    { id: 9, type: 'PLAYER', label: 'OPÇÃO 4', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null },
-    { id: 10, type: 'PLAYER', label: 'OPÇÃO 5', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null },
+    { id: 6, type: 'PLAYER', label: 'OPÇÃO 1', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null, assignedSalary: null },
+    { id: 7, type: 'PLAYER', label: 'OPÇÃO 2', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null, assignedSalary: null },
+    { id: 8, type: 'PLAYER', label: 'OPÇÃO 3', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null, assignedSalary: null },
+    { id: 9, type: 'PLAYER', label: 'OPÇÃO 4', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null, assignedSalary: null },
+    { id: 10, type: 'PLAYER', label: 'OPÇÃO 5', assignedName: null, assignedRole: null, assignedImage: null, assignedCharacteristic: null, assignedSalary: null },
 ];
+
+// Helper to format currency
+const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+};
 
 export const RosterBuilder: React.FC = () => {
   const [newName, setNewName] = useState('');
@@ -80,6 +88,9 @@ export const RosterBuilder: React.FC = () => {
   const boardRef = useRef<HTMLDivElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const [isCapturing, setIsCapturing] = useState(false);
+
+  // Calculate Total Cost
+  const totalMonthlyCost = slots.reduce((acc, slot) => acc + (slot.assignedSalary || 0), 0);
 
   // Save to LocalStorage whenever savedRosters changes
   useEffect(() => {
@@ -139,15 +150,17 @@ export const RosterBuilder: React.FC = () => {
     assignDataToSlot(slotId, data.type, data.value);
   };
 
-  const assignDataToSlot = (slotId: number, type: 'NAME' | 'ROLE' | 'CHARACTERISTIC', value: string) => {
+  const assignDataToSlot = (slotId: number, type: 'NAME' | 'ROLE' | 'CHARACTERISTIC' | 'SALARY', value: string | number) => {
     const newSlots = slots.map(slot => {
       if (slot.id === slotId) {
         if (type === 'NAME') {
-          return { ...slot, assignedName: value };
+          return { ...slot, assignedName: value as string };
         } else if (type === 'ROLE') {
-          return { ...slot, assignedRole: value };
+          return { ...slot, assignedRole: value as string };
         } else if (type === 'CHARACTERISTIC') {
-          return { ...slot, assignedCharacteristic: value };
+          return { ...slot, assignedCharacteristic: value as string };
+        } else if (type === 'SALARY') {
+          return { ...slot, assignedSalary: value as number };
         }
       }
       return slot;
@@ -163,10 +176,6 @@ export const RosterBuilder: React.FC = () => {
   const handleSelectionFromModal = (type: 'NAME' | 'ROLE', value: string) => {
     if (activeSlotId !== null) {
         assignDataToSlot(activeSlotId, type, value);
-        if(type === 'NAME') {
-            // Optional: Close modal on name select? 
-            // setActiveSlotId(null);
-        }
     }
   };
 
@@ -196,9 +205,10 @@ export const RosterBuilder: React.FC = () => {
     const newSlots = slots.map(s => s.id === slotId ? { 
         ...s, 
         assignedName: null, 
-        assignedRole: s.type === 'COACH' ? 'COACH' : null,
+        assignedRole: s.type === 'STAFF' ? (s.id === 0 ? 'COACH' : 'ANALISTA') : null, // Reset role based on original type
         assignedImage: null,
-        assignedCharacteristic: null
+        assignedCharacteristic: null,
+        assignedSalary: null
     } : s);
     updateBoardState(newSlots);
   };
@@ -220,7 +230,8 @@ export const RosterBuilder: React.FC = () => {
             assignedName: sourceSlot.assignedName,
             assignedRole: sourceSlot.assignedRole,
             assignedImage: sourceSlot.assignedImage,
-            assignedCharacteristic: sourceSlot.assignedCharacteristic
+            assignedCharacteristic: sourceSlot.assignedCharacteristic,
+            assignedSalary: sourceSlot.assignedSalary
         } : s);
         updateBoardState(newSlots);
     } else {
@@ -258,9 +269,10 @@ export const RosterBuilder: React.FC = () => {
         const newSlots = slots.map(s => ({ 
             ...s, 
             assignedName: null, 
-            assignedRole: s.type === 'COACH' ? 'COACH' : null,
+            assignedRole: s.type === 'STAFF' ? (s.id === 0 ? 'COACH' : 'ANALISTA') : null,
             assignedImage: null,
-            assignedCharacteristic: null
+            assignedCharacteristic: null,
+            assignedSalary: null
         }));
         updateBoardState(newSlots);
         setRosterName('NOME DO ELENCO');
@@ -578,29 +590,49 @@ export const RosterBuilder: React.FC = () => {
                         placeholder="NOME DO ELENCO"
                         title="Clique para editar o nome do elenco"
                     />
-                    <p className="text-zinc-500 text-[10px] md:text-sm font-bold tracking-[0.3em] uppercase mt-1">
-                        TS SCOUT PRO // ROSTER BUILDER
-                    </p>
+                    <div className="flex flex-col md:flex-row md:items-center justify-between mt-1">
+                        <p className="text-zinc-500 text-[10px] md:text-sm font-bold tracking-[0.3em] uppercase">
+                            TS SCOUT PRO // ROSTER BUILDER
+                        </p>
+                        
+                        {/* Total Salary Display */}
+                        {totalMonthlyCost > 0 && (
+                            <div className="flex items-center gap-2 bg-zinc-950 border border-emerald-900/50 px-3 py-1 rounded-md mt-2 md:mt-0">
+                                <Wallet size={16} className="text-emerald-500" />
+                                <span className="text-zinc-400 text-xs font-bold uppercase tracking-wider">Custo Mensal:</span>
+                                <span className="text-emerald-400 font-rajdhani font-bold text-lg">{formatCurrency(totalMonthlyCost)}</span>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
 
         <div className="relative z-10 w-full max-w-4xl flex flex-col items-center gap-8">
             
-            {/* Coach Slot */}
-            <div className="flex justify-center w-full mb-4">
-                {slots.filter(s => s.type === 'COACH').map(slot => (
-                     <SlotComponent 
-                        key={slot.id} 
-                        slot={slot} 
-                        style={slotStyle} 
-                        onDrop={onDrop} 
-                        onClear={clearSlot} 
-                        onImageUpload={handleImageUpload} 
-                        onDuplicate={duplicateSlot}
-                        onSlotClick={handleSlotClick} 
-                    />
-                ))}
+            {/* Staff Slots (Coach & Analyst) */}
+            <div className="w-full flex flex-col gap-2 items-center">
+                 <div className="w-full flex items-center gap-4 mb-2 opacity-50">
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-zinc-800 to-transparent"></div>
+                    <span className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] flex items-center gap-1">
+                        Comissão Técnica
+                    </span>
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-zinc-800 to-transparent"></div>
+                </div>
+                <div className="flex flex-wrap justify-center w-full gap-4 md:gap-8 mb-4">
+                    {slots.filter(s => s.type === 'STAFF').map(slot => (
+                        <SlotComponent 
+                            key={slot.id} 
+                            slot={slot} 
+                            style={slotStyle} 
+                            onDrop={onDrop} 
+                            onClear={clearSlot} 
+                            onImageUpload={handleImageUpload} 
+                            onDuplicate={duplicateSlot}
+                            onSlotClick={handleSlotClick} 
+                        />
+                    ))}
+                </div>
             </div>
 
             {/* Players Slots - ROW 1 (MAIN - NOW ONLY 4) */}
@@ -695,7 +727,7 @@ export const RosterBuilder: React.FC = () => {
                                 <p className="text-zinc-400 text-sm">
                                     Clique no <strong>ícone do boneco</strong> dentro do card para fazer upload da foto do jogador.
                                     Clique na área do <strong>Logo</strong> no topo para adicionar o escudo do time.
-                                    <strong>NOVO:</strong> Adicione uma "palavra-chave" (ex: IGL, Bala) no menu de edição.
+                                    <strong>NOVO:</strong> Adicione uma "palavra-chave" e defina o <strong>Salário</strong> no menu de edição.
                                 </p>
                             </div>
                         </div>
@@ -707,7 +739,7 @@ export const RosterBuilder: React.FC = () => {
                              <ul className="space-y-2 text-sm text-zinc-300">
                                 <li className="flex items-center gap-2"><Copy size={14} className="text-zinc-500" /> <strong>Duplicar:</strong> Copia o jogador para o próximo slot vazio.</li>
                                 <li className="flex items-center gap-2"><Trash2 size={14} className="text-zinc-500" /> <strong>Limpar:</strong> Remove nome, foto e função do slot.</li>
-                                <li className="flex items-center gap-2"><Undo size={14} className="text-zinc-500" /> <strong>Desfazer:</strong> Reverte a última ação.</li>
+                                <li className="flex items-center gap-2"><Banknote size={14} className="text-emerald-500" /> <strong>Financeiro:</strong> Custo total calculado automaticamente.</li>
                                 <li className="flex items-center gap-2"><Download size={14} className="text-yellow-500" /> <strong>PNG:</strong> Baixa a imagem em alta qualidade.</li>
                              </ul>
                         </div>
@@ -784,20 +816,56 @@ export const RosterBuilder: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Characteristic Input Section (NEW) */}
-                    <div>
-                         <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-                            <Tag size={12} /> Definição (1 Palavra)
-                         </h4>
-                         <input 
-                            type="text" 
-                            maxLength={15}
-                            placeholder="EX: BALA, IGL, SUPORTE..."
-                            value={activeSlot.assignedCharacteristic || ''}
-                            onChange={(e) => assignDataToSlot(activeSlotId, 'CHARACTERISTIC', e.target.value.toUpperCase())}
-                            className="w-full bg-zinc-950 border border-zinc-800 rounded p-3 text-white font-rajdhani font-bold focus:border-yellow-500 focus:outline-none uppercase tracking-wider"
-                         />
-                         <p className="text-[10px] text-zinc-600 mt-1 italic">Aparecerá como uma tag no card do jogador.</p>
+                    {/* Salary & Characteristic Section */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Characteristic Input */}
+                        <div>
+                             <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                <Tag size={12} /> Definição (Tag)
+                             </h4>
+                             <input 
+                                type="text" 
+                                maxLength={15}
+                                placeholder="EX: BALA, IGL..."
+                                value={activeSlot.assignedCharacteristic || ''}
+                                onChange={(e) => assignDataToSlot(activeSlotId, 'CHARACTERISTIC', e.target.value.toUpperCase())}
+                                className="w-full bg-zinc-950 border border-zinc-800 rounded p-3 text-white font-rajdhani font-bold focus:border-yellow-500 focus:outline-none uppercase tracking-wider text-sm"
+                             />
+                        </div>
+
+                        {/* Salary Slider */}
+                        <div>
+                            <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                <Banknote size={12} /> Salário Mensal
+                             </h4>
+                            <div className="bg-zinc-950 border border-zinc-800 p-3 rounded">
+                                <div className="flex justify-between items-center mb-2">
+                                    <span className="text-xs text-zinc-500">R$</span>
+                                    <input 
+                                        type="number"
+                                        min="0"
+                                        step="100"
+                                        value={activeSlot.assignedSalary || ''}
+                                        onChange={(e) => assignDataToSlot(activeSlotId, 'SALARY', parseInt(e.target.value) || 0)}
+                                        placeholder="0"
+                                        className="w-24 bg-transparent text-right text-emerald-500 font-bold font-rajdhani text-lg focus:outline-none focus:border-b border-emerald-500/50 placeholder-zinc-700"
+                                    />
+                                </div>
+                                <input 
+                                    type="range" 
+                                    min="1000" 
+                                    max="20000" 
+                                    step="100"
+                                    value={activeSlot.assignedSalary || 0}
+                                    onChange={(e) => assignDataToSlot(activeSlotId, 'SALARY', parseInt(e.target.value))}
+                                    className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                                />
+                                <div className="flex justify-between mt-1 text-[9px] text-zinc-600 font-bold">
+                                    <span>1k</span>
+                                    <span>20k</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                 </div>
@@ -882,9 +950,9 @@ const SlotComponent: React.FC<{
                     {slot.assignedImage ? (
                         <img src={slot.assignedImage} alt="Player" className="w-full h-full object-cover" />
                     ) : (
-                        slot.type === 'COACH' ? 
-                            <MonitorPlay size={32} className={slot.assignedName ? "text-yellow-500" : "text-zinc-700"} /> : 
-                            <User size={40} className={slot.assignedName ? "text-yellow-500" : "text-zinc-700"} />
+                        (slot.type === 'STAFF' && slot.label === 'COACH') ? <MonitorPlay size={32} className={slot.assignedName ? "text-yellow-500" : "text-zinc-700"} /> : 
+                        (slot.type === 'STAFF' && slot.label === 'ANALISTA') ? <ScanEye size={32} className={slot.assignedName ? "text-blue-500" : "text-zinc-700"} /> : 
+                        <User size={40} className={slot.assignedName ? "text-yellow-500" : "text-zinc-700"} />
                     )}
 
                     {/* Upload Overlay */}
@@ -909,17 +977,26 @@ const SlotComponent: React.FC<{
 
                     {slot.assignedName ? (
                         <div className="flex flex-col">
-                            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-0.5">Player</span>
+                            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mb-0.5">{slot.label === 'ANALISTA' ? 'Staff' : 'Player'}</span>
                             <span className={`font-rajdhani font-bold text-white leading-none ${textSizeClass}`}>
                                 {slot.assignedName}
                             </span>
                             
-                            {/* Characteristic Tag */}
-                            {slot.assignedCharacteristic && (
-                                <span className="text-[9px] text-yellow-500 font-bold uppercase tracking-widest mt-1">
-                                    // {slot.assignedCharacteristic}
-                                </span>
-                            )}
+                            {/* Tags Row */}
+                            <div className="flex gap-2 mt-1">
+                                {/* Characteristic Tag */}
+                                {slot.assignedCharacteristic && (
+                                    <span className="text-[8px] text-yellow-500 font-bold uppercase tracking-widest border border-yellow-500/20 px-1 rounded">
+                                        {slot.assignedCharacteristic}
+                                    </span>
+                                )}
+                                {/* Salary Tag */}
+                                {slot.assignedSalary && (
+                                    <span className="text-[8px] text-emerald-500 font-bold uppercase tracking-widest border border-emerald-500/20 px-1 rounded flex items-center gap-0.5">
+                                        R$ {slot.assignedSalary >= 1000 ? `${(slot.assignedSalary / 1000).toFixed(1)}k` : slot.assignedSalary}
+                                    </span>
+                                )}
+                            </div>
                             
                             {/* Actions Group (No Print) */}
                             <div className="absolute bottom-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-all no-print" data-html2canvas-ignore>
@@ -941,7 +1018,7 @@ const SlotComponent: React.FC<{
                         </div>
                     ) : (
                         <span className="text-zinc-600 text-xs font-bold uppercase tracking-wider">
-                            Toque para Editar
+                            {slot.label}
                         </span>
                     )}
                  </div>
@@ -993,7 +1070,9 @@ const SlotComponent: React.FC<{
                     {slot.assignedImage ? (
                         <img src={slot.assignedImage} alt="Player" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                     ) : (
-                        slot.type === 'COACH' ? <MonitorPlay size={64} strokeWidth={1} /> : <User size={80} strokeWidth={1} />
+                        (slot.type === 'STAFF' && slot.label === 'COACH') ? <MonitorPlay size={64} strokeWidth={1} /> : 
+                        (slot.type === 'STAFF' && slot.label === 'ANALISTA') ? <ScanEye size={64} strokeWidth={1} /> :
+                        <User size={80} strokeWidth={1} />
                     )}
 
                     {/* Upload Overlay */}
@@ -1006,7 +1085,7 @@ const SlotComponent: React.FC<{
                 <div 
                     onClick={() => onSlotClick(slot.id)}
                     className={`
-                        w-full py-4 min-h-[64px] flex items-center justify-center text-center z-10 border-t transition-colors cursor-pointer hover:bg-zinc-900
+                        w-full py-3 min-h-[64px] flex items-center justify-center text-center z-10 border-t transition-colors cursor-pointer hover:bg-zinc-900
                         ${slot.assignedName ? 'bg-zinc-900/90 border-yellow-500/50' : 'bg-zinc-950/90 border-zinc-800'}
                     `}
                     title="Clique para editar nome"
@@ -1019,8 +1098,15 @@ const SlotComponent: React.FC<{
                             
                             {/* Characteristic Tag */}
                             {slot.assignedCharacteristic && (
-                                <span className="text-[9px] text-yellow-500 font-bold uppercase tracking-widest mt-1">
+                                <span className="text-[9px] text-yellow-500 font-bold uppercase tracking-widest mt-0.5">
                                     {slot.assignedCharacteristic}
+                                </span>
+                            )}
+
+                            {/* Salary Tag */}
+                            {slot.assignedSalary && (
+                                <span className="text-[9px] text-emerald-500 font-bold uppercase tracking-widest mt-0.5 bg-emerald-500/10 px-1 rounded">
+                                    {formatCurrency(slot.assignedSalary)}
                                 </span>
                             )}
                             
@@ -1044,7 +1130,7 @@ const SlotComponent: React.FC<{
                         </div>
                     ) : (
                         <span className="text-zinc-600 text-xs font-bold uppercase tracking-wider pointer-events-none">
-                            Toque para Editar
+                            {slot.label}
                         </span>
                     )}
                 </div>
